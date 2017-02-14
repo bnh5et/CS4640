@@ -69,9 +69,25 @@
        
        
        //this function tests whether or not text is filled
-       function isTextFilled()
+       function isTextFilled(form)
        {
-           
+           cnt = 0;
+           msg = "";
+
+           if (form.question.value == "") {
+              msg += "No question was entered. \n";
+              cnt++;
+           }
+           if (form.answer.value == "") {
+              msg += "No answer was entered. \n";
+              cnt++;
+           }
+
+           if (cnt > 0) {
+              alert ("Please correct the following: \n \n" + msg);
+              return false;
+           }
+           else return true;
        }
        
        //extra function--changes background color
@@ -119,17 +135,17 @@
 
   <div id="shortAns">    
     <!--This is the short answer table with question and answer-->
-    <form method="post" action="formHandler.php" onsubmit="isTextFilled()">
+    <form onSubmit="return isTextFilled(this)" method="post" action="formHandler.php">
       
       Question:
       <br/>
-      <input type="text" name="question" id="question"/> 
+      <input type="text" name="question"/> 
       <br/>
       <br/>
 
       Answer: 
       <br/>
-      <textarea rows="8" cols="50"></textarea>
+      <textarea rows="8" cols="50" name="answer"></textarea>
       
       <br/>
       <br/>      
