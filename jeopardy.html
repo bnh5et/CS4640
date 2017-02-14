@@ -16,37 +16,54 @@
 			margin: 40px;
 			border-radius: 15px;
 		}
-      	a:hover {
-        	background-color: yellow; 
-    	} 
-    	input {
-    		width: 80px;    		
-    	}  
-    	h1 {
-    	}   
+    a:hover {
+      background-color: yellow; 
+    } 
+    input {
+    	width: 100px;    		
+    }  
+    #multChoice, #trueFalse, #shortAns { 
+      display: none;
+    } 
+    button {
+      border: 2px solid maroon;
+      background-color: maroon;
+      font-family: Verdana, Geneva, sans-serif;
+      color: white;
+      font-size: 15px;
+      border-radius: 5px;
+    } 
+    button:hover {
+      cursor: pointer;
+      box-shadow: 
+    }
+    button:focus {
+      outline: 0;
+    }
+
 	</style>
 
    <script type="text/javascript">
-       //this function should take in the selected item from spin box and make the appropriate response input form visible
+       //this function should take in the selected item from drop down and make the appropriate response input form visible
        function toggleQuesVisibility(slctd)
        {
-           if (slctd == "mc")
+           if (slctd.value == "mc")
            {
-                document.getElementById('multChoice').style.visibility = "visible";
-                document.getElementById('trueFalse').style.visibility = "hidden";
-                document.getElementById('shortAns').style.visibility = "hidden";
+                document.getElementById('multChoice').style.display = "block";
+                document.getElementById('trueFalse').style.display = "none";
+                document.getElementById('shortAns').style.display = "none";
            }
-           else if (slctd == "tf")
+           else if (slctd.value == "tf")
            {
-                document.getElementById('multChoice').style.visibility = "hidden";
-                document.getElementById('trueFalse').style.visibility = "visible";
-                document.getElementById('shortAns').style.visibility = "hidden";
+                document.getElementById('multChoice').style.display = "none";
+                document.getElementById('trueFalse').style.display = "block";
+                document.getElementById('shortAns').style.display = "none";
            }
-           if (slctd == "sa")
+           if (slctd.value == "sa")
            {
-                document.getElementById('multChoice').style.visibility = "hidden";
-                document.getElementById('trueFalse').style.visibility = "hidden";
-                document.getElementById('shortAns').style.visibility = "visible";
+                document.getElementById('multChoice').style.display = "none";
+                document.getElementById('trueFalse').style.display = "none";
+                document.getElementById('shortAns').style.display = "block";
            }
        }
        
@@ -74,6 +91,7 @@
        }
        
    </script>
+
 </head>
 <body>
 <center>
@@ -85,46 +103,77 @@
 
         
         <!--spin box with options for type of question-->
-		<select name="questions">
+		<select name="questions" onchange="toggleQuesVisibility(this);">
 			<option selected="selected" disabled>Select</option>
-			<option value="mc" onclick="toggleVisibility(mc);">Multiple Choice</option>
+			<option value="mc" >Multiple Choice</option>
 			<option value="tf">True/False</option>
 			<option value="sa">Short Answer</option>
 		</select>
-    
-        <br/>
-        <br/>
-        
-        
-        <!--This is the short answer table with question and answer-->
-        <form name="shortAns">
-        <table>
-            <tr>
-                <td><label>Question:</label> <br/>
-                <input type="text" name="question" id="question" value=""/> </td>
-            </tr>
-            
-            <tr>
-                <td><label>Answer:</label> <br/>
-                <input type="text" name="answer" id="answer" value=""/></td>
-            </tr>
-        </table>
-        </form>
-        
-        
-        <br/>
-        
-        <!--submit/reset buttons-->
-		
-        <form>
-            
-			<input type="submit" name="submit" value="Submit">
-			<input type="reset" name="reset" value="Reset">
-		</form>
 
-        <input type="button" name="toggle" value="Toggle" onclick='toggleBgColor();'>
-    </div>
+    <br/>
+    <br/>
 
+    <button onclick='toggleBgColor();'>Change <br/>Background Color!</button>   
+
+  </div>
+
+  <div id="shortAns">    
+    <!--This is the short answer table with question and answer-->
+    <form method="post" action="formHandler.php" onsubmit="isTextFilled()">
+      
+      Question:
+      <br/>
+      <input type="text" name="question" id="question"/> 
+      <br/>
+      <br/>
+
+      Answer: 
+      <br/>
+      <textarea rows="8" cols="50"></textarea>
+      
+      <br/>
+      <br/>      
+
+		  <input type="submit" name="submit" value="Submit">
+		  <input type="reset" name="reset" value="Reset">
+
+	  </form>
+  </div>
+
+  <div id="multChoice">
+    <form method="post" action="formHandler.php">
+      Select your favorite color:
+      <div style="box-shadow: 0 0 0 white; margin: 0; padding-left: calc(50% - 60px); text-align: left;">
+        <input type="radio" name="colors" value="Blue">Blue
+        <br>
+        <input type="radio" name="colors" value="Red">Red
+        <br/>
+        <input type="radio" name="colors" value="Green">Green
+        <br/>
+        <input type="radio" name="colors" value="Yellow">Yellow
+        <br/>
+      </div>
+
+      <input type="submit" name="submit" value="Submit">
+      <input type="reset" name="reset" value="Reset">
+    </form>
+  </div>
+
+  <div id="trueFalse">
+    <form method="post" action="formHandler.php">
+      TJ founded UVA.
+      <select name="tf">
+        <option selected="selected" disabled>Select</option>
+        <option value="true">True</option>
+        <option value="false">False</option>
+      </select>
+      <br>
+      <br>
+
+      <input type="submit" name="submit" value="Submit">
+      <input type="reset" name="reset" value="Reset">
+    </form>
+  </div>
 </center>
 </body>
 
