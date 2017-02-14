@@ -114,18 +114,18 @@
        
        //extra function--changes background color
        function toggleBgColor()
-       {
-              
+       {    
            if (document.body.style.backgroundColor == "maroon")
                {
                    document.body.style.backgroundColor = "SlateGrey";
+                   document.getElementById("btn").style.backgroundColor = "maroon";
                }
            else
                {
                    document.body.style.backgroundColor = "maroon";
-               }
-           
-           
+                   document.getElementById("btn").style.backgroundColor = "SlateGrey";
+                   document.getElementById("btn").style.border = "SlateGrey"; 
+	       } 
        }
        
    </script>
