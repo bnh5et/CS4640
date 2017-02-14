@@ -11,17 +11,26 @@
 
   <table cellSpacing=1 cellPadding=1 width="75%" border=1 bgColor="lavender">
     <tr bgcolor="#FFFFFF">
-      <td align="center"><strong>Parameter</strong></td>
-      <td align="center"><string>Value</string></td>
+      <td align="center"><strong>Question Type</strong></td>
+      <td align="center"><string>Input</string></td>
+    </tr>......
+     <tr>
+      <td width="20%">Multiple Choice</td> 
+      <td><?php if (isset($_POST['colors'])) { echo $_POST['colors']; } ?></td>      
     </tr>
-    <!--<tr>
-      <td width="20%">MAILTO</td> 
-      <td><?php echo $_POST['MAILTO']?></td>      
-    </tr>-->
     <tr>
-      <td width="20%">submit</td>
-      <td><?php echo $_POST['submit']?></td>      
-    </tr>    
+      <td width="20%">T/F</td> 
+      <td><?php if (isset($_POST['tf'])) { echo $_POST['tf']; }?></td>      
+    </tr>
+     <tr>
+      <td width="20%">Question</td> 
+      <td><?php if (isset($_POST['question'])) { echo $_POST['question']; }?></td>      
+    </tr>
+    <tr>
+      <td width="20%">Answer</td> 
+      <td><?php if (isset($_POST['answer'])) { echo $_POST['answer']; }?></td>      
+    </tr>
+
   </table>
 
 </body>
