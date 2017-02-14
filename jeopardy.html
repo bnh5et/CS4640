@@ -89,6 +89,28 @@
            }
            else return true;
        }
+
+       function isSelected(form) {
+          if (form.tf.value == "default") {
+            alert("Please choose true or false.");
+            return false;
+          }
+          else return true;
+       }
+
+       function hasColor(form) {
+          if (
+            !document.getElementById("blue").checked && 
+            !document.getElementById("red").checked &&
+            !document.getElementById("green").checked &&
+            !document.getElementById("yellow").checked
+            ) {
+            alert("Please choose a color.");
+            return false;
+          }
+          else return true;
+       }
+      
        
        //extra function--changes background color
        function toggleBgColor()
@@ -157,16 +179,16 @@
   </div>
 
   <div id="multChoice">
-    <form method="post" action="formHandler.php">
+    <form onsubmit="return hasColor(this)" method="post" action="formHandler.php">
       Select your favorite color:
-      <div style="box-shadow: 0 0 0 white; margin: 0; padding-left: calc(50% - 60px); text-align: left;">
-        <input type="radio" name="colors" value="Blue">Blue
+      <div style="box-shadow: 0 0 0 white; margin: 0; padding: 0; text-align: left;">
+        <input type="radio" name="colors" value="blue" id="blue">Blue
         <br>
-        <input type="radio" name="colors" value="Red">Red
+        <input type="radio" name="colors" value="red" id="red">Red
         <br/>
-        <input type="radio" name="colors" value="Green">Green
+        <input type="radio" name="colors" value="green" id="green">Green
         <br/>
-        <input type="radio" name="colors" value="Yellow">Yellow
+        <input type="radio" name="colors" value="yellow" id="yellow">Yellow
         <br/>
       </div>
 
@@ -176,10 +198,10 @@
   </div>
 
   <div id="trueFalse">
-    <form method="post" action="formHandler.php">
+    <form onSubmit="return isSelected(this)" method="post" action="formHandler.php">
       TJ founded UVA.
       <select name="tf">
-        <option selected="selected" disabled>Select</option>
+        <option value="default" selected="selected" disabled>Select</option>
         <option value="true">True</option>
         <option value="false">False</option>
       </select>
