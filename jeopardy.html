@@ -8,7 +8,6 @@
 		body {
 			font-family: Verdana, Geneva, sans-serif;
 			background-color: SlateGrey;
-
 		}
 		div {
 			box-shadow: 0 0 5px;
@@ -24,34 +23,107 @@
     		width: 80px;    		
     	}  
     	h1 {
-
     	}   
 	</style>
 
    <script type="text/javascript">
-
+       //this function should take in the selected item from spin box and make the appropriate response input form visible
+       function toggleQuesVisibility(slctd)
+       {
+           if (slctd == "mc")
+           {
+                document.getElementById('multChoice').style.visibility = "visible";
+                document.getElementById('trueFalse').style.visibility = "hidden";
+                document.getElementById('shortAns').style.visibility = "hidden";
+           }
+           else if (slctd == "tf")
+           {
+                document.getElementById('multChoice').style.visibility = "hidden";
+                document.getElementById('trueFalse').style.visibility = "visible";
+                document.getElementById('shortAns').style.visibility = "hidden";
+           }
+           if (slctd == "sa")
+           {
+                document.getElementById('multChoice').style.visibility = "hidden";
+                document.getElementById('trueFalse').style.visibility = "hidden";
+                document.getElementById('shortAns').style.visibility = "visible";
+           }
+       }
+       
+       
+       //this function tests whether or not text is filled
+       function isTextFilled()
+       {
+           
+       }
+       
+       //extra function--changes background color
+       function toggleBgColor()
+       {
+              
+           if (document.body.style.backgroundColor == "maroon")
+               {
+                   document.body.style.backgroundColor = "SlateGrey";
+               }
+           else
+               {
+                   document.body.style.backgroundColor = "maroon";
+               }
+           
+           
+       }
+       
    </script>
 </head>
 <body>
 <center>
-	<div>
+	<div id="mainpage">
 		<h1>Let's Play Jeopardy!</h1>	
 		<h4>Briana Hart and Samantha Pitcher</h4>
 
 		<p>Choose the type of question that you would like to answer from the dropdown menu below.</p>
 
+        
+        <!--spin box with options for type of question-->
 		<select name="questions">
 			<option selected="selected" disabled>Select</option>
-			<option value="mc">Multiple Choice</option>
+			<option value="mc" onclick="toggleVisibility(mc);">Multiple Choice</option>
 			<option value="tf">True/False</option>
 			<option value="sa">Short Answer</option>
 		</select>
-
-		<!--<form>
+    
+        <br/>
+        <br/>
+        
+        
+        <!--This is the short answer table with question and answer-->
+        <form name="shortAns">
+        <table>
+            <tr>
+                <td><label>Question:</label> <br/>
+                <input type="text" name="question" id="question" value=""/> </td>
+            </tr>
+            
+            <tr>
+                <td><label>Answer:</label> <br/>
+                <input type="text" name="answer" id="answer" value=""/></td>
+            </tr>
+        </table>
+        </form>
+        
+        
+        <br/>
+        
+        <!--submit/reset buttons-->
+		
+        <form>
+            
 			<input type="submit" name="submit" value="Submit">
 			<input type="reset" name="reset" value="Reset">
-		</form>-->
-	</div>
+		</form>
+
+        <input type="button" name="toggle" value="Toggle" onclick='toggleBgColor();'>
+    </div>
 
 </center>
 </body>
