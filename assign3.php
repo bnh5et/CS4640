@@ -194,5 +194,4 @@ echo "<html>
 </center>
 </body>
 
-</html>"
-?>
+</html>
