@@ -31,22 +31,33 @@ public class assign4 extends HttpServlet {
 		//read text file that stores questions and answers from previous assignment:
 			//read text file from CSLAB Ubuntu server /cslab/home/bnh5et/public_html/projectName
 
-		//create question array
-		//create answer array
+		//create question arraylist
+		//create answer arraylist
+		ArrayList<String> questions = new ArrayList<String>();
+		ArrayList<String> answers = new ArrayList<String>();
 		
-		URL url = new URL("http://plato.cs.virginia.edu/cslab/home/bnh5et/public_html/projectName");
+		URL url = new URL("http://plato.cs.virginia.edu/~bnh5et/HW/data/data.txt");
 		Scanner scanner = new Scanner(url.openStream());
 		
-		
+		//count number of lines in the data doc
+		int count = 0;
 		while (scanner.hasNext())
 		{
-			//save question to question array
-			//save answer to answer array
+			count++;
 			scanner.next();			
 		}
 		
+		Scanner reader = new Scanner(url.openStream());
+		//account for there existing both questions and answers
+		count = count / 2;
+		//add the questions and answers to question and anser arraylists
+		for (int i = 0; i < count; i++)
+		{
+			questions.add(reader.nextLine());
+			answers.add(reader.nextLine());
+		}
 		
-	
+		//now we have all the questions and answers saved
 		//display html form that has: 
 			//title and team members' names
 			//list of questions and answers
