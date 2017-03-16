@@ -31,6 +31,10 @@ public class assign4 extends HttpServlet {
 		//read text file that stores questions and answers from previous assignment:
 			//read text file from CSLAB Ubuntu server /cslab/home/bnh5et/public_html/projectName
 
+		//TODO we need to change the file so it has a question on one line, then answer on the next
+		
+		
+		
 		//create question arraylist
 		//create answer arraylist
 		ArrayList<String> questions = new ArrayList<String>();
