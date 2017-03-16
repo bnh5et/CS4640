@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
@@ -27,6 +28,9 @@ public class assign4 extends HttpServlet {
         
     }
 
+	ArrayList<String> questions = new ArrayList<String>();
+	ArrayList<String> answers = new ArrayList<String>();
+    
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -35,11 +39,6 @@ public class assign4 extends HttpServlet {
 			//read text file from CSLAB Ubuntu server /cslab/home/bnh5et/public_html/projectName
 
 		//TODO change file so it's question on one line, corresponding answer on the next
-		
-		//create question arraylist
-		//create answer arraylist
-		ArrayList<String> questions = new ArrayList<String>();
-		ArrayList<String> answers = new ArrayList<String>();
 		
 		URL url = new URL("http://plato.cs.virginia.edu/~bnh5et/HW/data/data.txt");
 		Scanner scanner = new Scanner(url.openStream());
@@ -63,8 +62,6 @@ public class assign4 extends HttpServlet {
 		}
 		
 		//now we have all the questions and answers saved
-		
-		
 	
 		//display html form that has: 
 			//title and team members' names
@@ -101,6 +98,21 @@ public class assign4 extends HttpServlet {
 			//include button that allows user to go back to edit the question
 			//just want a grid where each cell shows the score
 			//can do a formhandler:  http://www.cs.virginia.edu/~up3f/cs4640/examples/servlet/formHandler.java
+		
+		response.setContentType("text/html");
+		PrintWriter jeopardyWriter = response.getWriter();
+		
+		String str;
+		Enumeration input = request.getParameterNames();
+		
+		while (input.hasMoreElements())
+		{
+			str = (String) input.nextElement();
+			if (!str.equalsIgnoreCase("submit"))
+			{
+				//add the things from input
+			}
+		}
 		
 		
 		doGet(request, response);
