@@ -1,7 +1,10 @@
 
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
@@ -31,9 +34,7 @@ public class assign4 extends HttpServlet {
 		//read text file that stores questions and answers from previous assignment:
 			//read text file from CSLAB Ubuntu server /cslab/home/bnh5et/public_html/projectName
 
-		//TODO we need to change the file so it has a question on one line, then answer on the next
-		
-		
+		//TODO change file so it's question on one line, corresponding answer on the next
 		
 		//create question arraylist
 		//create answer arraylist
@@ -62,6 +63,9 @@ public class assign4 extends HttpServlet {
 		}
 		
 		//now we have all the questions and answers saved
+		
+		
+	
 		//display html form that has: 
 			//title and team members' names
 			//list of questions and answers
@@ -78,17 +82,25 @@ public class assign4 extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-		//process form data submission
-			//list of questions, answers, rows, columns, scores
+		//this is for the submit button
 		
+		PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
+		//dummy strings for question, answer, row, column, score
+		writer.println("Question" + "; " + "Answer" + "; " + "row" + "; " + "column" + "; " + "score" );
+		writer.close();
+		
+		//process form data submission
+	    //take the list of questions, answers, rows, columns, scores
 		//write these to a text file on your machine
 			//can use comma or semicolon to separate each piece of data
+		//http://www.cs.virginia.edu/~up3f/cs4640/inclass/simpleform.java
+		
+		
 		
 		//create jeopardy game and display it on screen
 			//include button that allows user to go back to edit the question
 			//just want a grid where each cell shows the score
-		
+			//can do a formhandler:  http://www.cs.virginia.edu/~up3f/cs4640/examples/servlet/formHandler.java
 		
 		
 		doGet(request, response);
