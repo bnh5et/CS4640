@@ -22,7 +22,6 @@ input.form, a {
   font-size: 12px;
   border-radius: 5px;
   padding: 5px;  	
-  text-align: center; 	
 } 
 input.form:hover {
   cursor: pointer;
