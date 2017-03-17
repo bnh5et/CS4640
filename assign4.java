@@ -81,11 +81,17 @@ public class assign4 extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//this is for the submit button
 		
+		
+		try {
+		
+		
 		PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
 		//dummy strings for question, answer, row, column, score
 		writer.println("Question" + "; " + "Answer" + "; " + "row" + "; " + "column" + "; " + "score" );
 		writer.close();
-		
+		} catch (IOException e) {
+			System.out.println("Could not write to file");
+		}
 		//process form data submission
 	    //take the list of questions, answers, rows, columns, scores
 		//write these to a text file on your machine
@@ -98,7 +104,7 @@ public class assign4 extends HttpServlet {
 			//include button that allows user to go back to edit the question
 			//just want a grid where each cell shows the score
 			//can do a formhandler:  http://www.cs.virginia.edu/~up3f/cs4640/examples/servlet/formHandler.java
-		
+		try {
 		response.setContentType("text/html");
 		PrintWriter jeopardyWriter = response.getWriter();
 		
@@ -114,7 +120,10 @@ public class assign4 extends HttpServlet {
 			}
 		}
 		
-		
+		jeopardyWriter.close();
+		} catch (IOException e) {
+			System.out.println("Could not create jeopardy grid");
+		}
 		doGet(request, response);
 	}
 
