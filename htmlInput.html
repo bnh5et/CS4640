@@ -3,71 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>Jeopardy</title>
-
-	<style>
-		body {
-			font-family: Verdana, Geneva, sans-serif;
-			background-color: SlateGrey;
-		}
-		div {
-			box-shadow: 0 0 5px;
-			background-color: white;
-			padding: 20px;
-			margin: 40px;
-			border-radius: 15px;
-		}
-    a:hover {
-      background-color: yellow; 
-    } 
-    input {
-    	width: 100px;    		
-    }  
-    #multChoice, #trueFalse, #shortAns { 
-      display: none;
-    } 
-    button {
-      border: 2px solid maroon;
-      background-color: maroon;
-      font-family: Verdana, Geneva, sans-serif;
-      color: white;
-      font-size: 15px;
-      border-radius: 5px;
-    } 
-    button:hover {
-      cursor: pointer;
-      box-shadow: 
-    }
-    button:focus {
-      outline: 0;
-    }
-    table, th, td {
-      border: 1px solid black;       
-    }
-	</style>
-
-   <script type="text/javascript">
-       //changes background color
-       function toggleBgColor()
-       {          
-           if (document.body.style.backgroundColor == "maroon")
-               {
-                   document.body.style.backgroundColor = "SlateGrey";
-                   document.getElementById("btn").style.backgroundColor = "maroon";
-               }
-           else
-               {
-                   document.body.style.backgroundColor = "maroon";
-                   document.getElementById("btn").style.backgroundColor = "SlateGrey";
-                  document.getElementById("btn").style.border = "SlateGrey"; 
-               }
-       }    
-   </script>
+<link rel="stylesheet" type="text/css" href="styles.css">
 
 </head>
 <body>
 <center>
 	<div id="mainpage">
-		<h1>Let's Play Jeopardy!</h1>	
+		<h1>Question Selector</h1>	
 		<h4>Briana Hart and Samantha Pitcher</h4>
 
 		<p>List of questions and answers:  </p> 
@@ -76,38 +18,45 @@
         <!-- TODO two fields where user can specify given row and column -->
         <!-- TODO field to specify score (display this in the given row and column) -->
 
-        <table>
+        <table style="text-align: center;">
           <tr>
-            <th>Question/Answer</th>
-            <th>Row</th>
-            <th>Column</th>
-            <th>Score</th>
+            <th style="width: 300px;">
+              Question/Answer 
+            </th>
+            <th style="width: 70px;">
+              Row  
+            </th>
+            <th style="width: 70px;">
+              Column
+            </th>
+            <th style="width: 70px;">
+              Score
+            </th>
           </tr>
           <tr>
-            <td>question:  </td>
-            <td>row:  </td>
-            <td>column:  </td>
-            <td>score:  </td>
+            <td>
+              <p style="font-weight: bold; padding: 0;">Question:<p>
+              <p style="font-weight: bold; padding: 0;">Answer:<p> 
+            </td>
+            <td>
+              <input type="text" name="rowNum">  
+            </td>
+            <td>
+              <input type="text" name="colNum"> 
+            </td>
+            <td>
+              <input type="text" name="score">
+            </td>
           </tr>
-            
-            <!-- new row for every question/answer set -->
-            
         </table>
-        
-        
-    <br/>
-    <br/>
-    <!-- background color toggle btn-->
-    <button onclick='toggleBgColor();' id="btn">Change <br/>Background Color!</button>   
-
+        <br/>
   </div>
-
+    <form>
     <!-- TODO one button to go to form from assign3, one to create game-->
-      <input type="submit" name="submit" value="Create Game">
-      <input type="reset" name="reset" value="Reset">
+      <a class="form" style="width: 100px;" href="http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php">Add More Q/A</a>
+      <input class="form" type="submit" name="submit" value="Create Game" style="width: 100px;">
     
     </form>
-  </div>
 </center>
 </body>
 

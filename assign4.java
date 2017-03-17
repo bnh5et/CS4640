@@ -1,5 +1,3 @@
-
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
@@ -114,6 +112,47 @@ public class assign4 extends HttpServlet {
 			int maxrows = 0;
 			int maxcols = 0;
 			for (int i = 0; i < row.size(); i++)
+			{
+				if (row.get(i) > maxrows)
+				{
+					maxrows = row.get(i);
+				}
+			}
+			
+			for (int i = 0; i < column.size(); i++)
+			{
+				if (column.get(i) > maxcols)
+				{
+					maxcols = column.get(i);
+				}
+			}
+			
+			
+			
+			response.setContentType("text/html");
+			PrintWriter jeopardyWriter = response.getWriter();
+		
+			String str;
+			Enumeration input = request.getParameterNames();
+		
+			jeopardyWriter.println("<html>");
+			//TODO and so on, to create rest of jeopardy grid
+			
+			while (input.hasMoreElements())
+			{
+				str = (String) input.nextElement();
+				if (!str.equalsIgnoreCase("submit"))
+				{
+					for (int i = 0; i < maxrows; i++)
+					{
+						//print right number of rows
+						//jeopardyWriter.println("<tr>");
+						//then, print right number of columns and add score
+					}
+					//add the things from input to the grid, only if it's not submit
+					//we want the score in the grid, that is all
+				}
+			}
 			{
 				if (row.get(i) > maxrows)
 				{
