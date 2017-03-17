@@ -21,7 +21,7 @@ input.form, a {
   text-decoration: none;
   font-size: 12px;
   border-radius: 5px;
-  padding: 5px;  		
+  padding: 5px;  	
 } 
 input.form:hover {
   cursor: pointer;

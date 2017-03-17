@@ -3,8 +3,11 @@
 <title>Jeopardy</title>
 <link rel="stylesheet" type="text/css" href="styles.css">
   <script type="text/javascript">
-    goBack() {
-      window.location.href = "http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php";
+    submitForm() {
+      document.forms['submitForm'].action='confirmation.php';
+      document.forms['submitForm'].submit();
+      document.forms['submitForm'].action='assign4';
+      document.forms['submitForm'].submit();
     }
   </script>
 
@@ -81,11 +84,11 @@
   </table>
   <p>
     
-  <form action=confirmation.php method="post">
+  <form action=confirmation.php method="post" name="submitForm">
     <a href="http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php" style="width: 100px;">Back</a>
     
     <!--Needs to navigate to htmlInput-->
-    <input class="form" type="submit" name="confirm" value="Confirm" onclick="callServlet()"></input>
+    <input class="form" onclick="submitForm();" name="confirm" value="Confirm"></input>
   </form>
   </center>
   </div>
@@ -110,10 +113,6 @@
   fwrite($file, $data);
   chmod("data/data.txt", 0777);
   fclose($file);
-
-  callServlet() {
-    file_get_contents("http://plato.cs.virginia.edu/~bnh5et/HW/assign4.java");
-  }
 
 ?>
 
