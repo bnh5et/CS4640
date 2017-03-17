@@ -1,9 +1,17 @@
 <html>
 <head>
-  <title>Jeopardy</title>
+<title>Jeopardy</title>
+<link rel="stylesheet" type="text/css" href="styles.css">
+  <script type="text/javascript">
+    goBack() {
+      window.location.href = "http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php";
+    }
+  </script>
+
 </head>
 
 <body bgcolor="#EEEEEE">
+  <div>
   <center><h2>Display Page</h2></center>
   <p>
     Please confirm values or click 'back'
@@ -73,30 +81,39 @@
   </table>
   <p>
     
-  <form action=formhandler3.php method="post">
-    <button onClick='window.history.back();' id="backbtn">Back</button>
-    <input type="submit" name="confirm" value="Confirm"></input>
+  <form action=confirmation.php method="post">
+    <a href="http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php" style="width: 100px;">Back</a>
+    
+    <!--Needs to navigate to htmlInput-->
+    <input class="form" type="submit" name="confirm" value="Confirm" onclick="callServlet()"></input>
   </form>
   </center>
+  </div>
 </body>
+
+
 </html>
 
 <?php
   $data = "";
 
   if(isset($_POST['colors']))
-    $data = "Your favorite color is: ". $_POST['colors'] . "\n";
+    $data = "What's your favorite color? " . "\n" . $_POST['colors'] . "\n";
 
   if(isset($_POST['tf']))
-    $data = "TJ founded UVA: " . $_POST['tf'] . "\n";
+    $data = "Did TJ found UVA?" . "\n". $_POST['tf'] . "\n";
 
   if (isset($_POST['question'])) 
-    $data = "Question: " . $_POST['question'] . "\n" . "Answer: " . $_POST['answer'] . "\n";
+    $data = $_POST['question'] . "\n" . $_POST['answer'] . "\n";
 
-  $file = fopen("data.txt", "a+");
+  $file = fopen("data/data.txt", "a+");
   fwrite($file, $data);
-  chmod("data.txt", 0777);
+  chmod("data/data.txt", 0777);
   fclose($file);
+
+  callServlet() {
+    file_get_contents("http://plato.cs.virginia.edu/~bnh5et/HW/assign4.java");
+  }
 
 ?>
 

@@ -1,44 +1,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Jeopardy</title>
-
-	<style>
-		body {
-			font-family: Verdana, Geneva, sans-serif;
-			background-color: SlateGrey;
-		}
-		div {
-			box-shadow: 0 0 5px;
-			background-color: white;
-			padding: 20px;
-			margin: 40px;
-			border-radius: 15px;
-		}
-    a:hover {
-      background-color: yellow; 
-    } 
-    input {
-    	width: 100px;    		
-    }  
-    #multChoice, #trueFalse, #shortAns { 
-      display: none;
-    } 
-    button {
-      border: 2px solid maroon;
-      background-color: maroon;
-      font-family: Verdana, Geneva, sans-serif;
-      color: white;
-      font-size: 15px;
-      border-radius: 5px;
-    } 
-    button:hover {
-      cursor: pointer;
-      box-shadow: 
-    }
-    button:focus {
-      outline: 0;
-    }
-	</style>
+<link rel="stylesheet" type="text/css" href="styles.css">
 
    <script type="text/javascript">
        //this function should take in the selected item from drop down and make the appropriate response input form visible
@@ -130,7 +93,7 @@
 
   <div id="shortAns">    
     <!--This is the short answer table with question and answer-->
-    <form onSubmit="return isTextFilled(this)" method="post" action="formHandler3.php">
+    <form onSubmit="return isTextFilled(this)" method="post" action="confirmation.php">
       
       Question:
       <br/>
@@ -145,14 +108,14 @@
       <br/>
       <br/>      
 
-		  <input type="submit" name="submit" value="Submit">
-		  <input type="reset" name="reset" value="Reset">
+		  <input class="form" type="submit" name="submit" value="Submit">
+		  <input class="form" type="reset" name="reset" value="Reset">
 
 	  </form>
   </div>
 
   <div id="multChoice">
-    <form method="post" action="formHandler3.php">
+    <form method="post" action="confirmation.php">
       Select your favorite color:
       <div style="box-shadow: 0 0 0 white; margin: 0; padding-left: calc(50% - 60px); text-align: left;">
         <input type="radio" name="colors" value="Blue" checked="checked">Blue
@@ -165,13 +128,13 @@
         <br/>
       </div>
 
-      <input type="submit" name="submit" value="Submit">
-      <input type="reset" name="reset" value="Reset">
+      <input class="form" type="submit" name="submit" value="Submit">
+      <input class="form" type="reset" name="reset" value="Reset">
     </form>
   </div>
 
   <div id="trueFalse">
-    <form method="post" action="formHandler3.php">
+    <form method="post" action="confirmation.php">
       TJ founded UVA.
       <select name="tf">
         <option value="True" selected="selected">True</option>
@@ -180,8 +143,8 @@
       <br>
       <br>
 
-      <input type="submit" name="submit" value="Submit">
-      <input type="reset" name="reset" value="Reset">
+      <input class="form" type="submit" name="submit" value="Submit">
+      <input class="form" type="reset" name="reset" value="Reset">
     </form>
   </div>
 </center>
