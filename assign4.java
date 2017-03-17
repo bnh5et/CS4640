@@ -34,7 +34,8 @@ public class assign4 extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
 		//read text file that stores questions and answers from previous assignment:
 			//read text file from CSLAB Ubuntu server /cslab/home/bnh5et/public_html/projectName
 
@@ -85,11 +86,13 @@ public class assign4 extends HttpServlet {
 		try {
 		
 		
-		PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
-		//dummy strings for question, answer, row, column, score
-		writer.println("Question" + "; " + "Answer" + "; " + "row" + "; " + "column" + "; " + "score" );
-		writer.close();
-		} catch (IOException e) {
+			PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
+			//dummy strings for question, answer, row, column, score
+			writer.println("Question" + "; " + "Answer" + "; " + "row" + "; " + "column" + "; " + "score" );
+			writer.close();
+		} 
+		catch (IOException e) 
+		{
 			System.out.println("Could not write to file");
 		}
 		//process form data submission
@@ -104,24 +107,27 @@ public class assign4 extends HttpServlet {
 			//include button that allows user to go back to edit the question
 			//just want a grid where each cell shows the score
 			//can do a formhandler:  http://www.cs.virginia.edu/~up3f/cs4640/examples/servlet/formHandler.java
-		try {
-		response.setContentType("text/html");
-		PrintWriter jeopardyWriter = response.getWriter();
-		
-		String str;
-		Enumeration input = request.getParameterNames();
-		
-		while (input.hasMoreElements())
+		try 
 		{
-			str = (String) input.nextElement();
-			if (!str.equalsIgnoreCase("submit"))
-			{
-				//add the things from input
-			}
-		}
+			response.setContentType("text/html");
+			PrintWriter jeopardyWriter = response.getWriter();
 		
-		jeopardyWriter.close();
-		} catch (IOException e) {
+			String str;
+			Enumeration input = request.getParameterNames();
+		
+			while (input.hasMoreElements())
+			{
+				str = (String) input.nextElement();
+				if (!str.equalsIgnoreCase("submit"))
+				{
+					//add the things from input
+				}
+			}
+		
+			jeopardyWriter.close();
+		} 
+		catch (IOException e) 
+		{
 			System.out.println("Could not create jeopardy grid");
 		}
 		doGet(request, response);
