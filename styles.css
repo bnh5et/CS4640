@@ -1,0 +1,67 @@
+body {
+	font-family: Verdana, Geneva, sans-serif;
+	background-color: SlateGrey;
+}
+div {
+	box-shadow: 0 0 5px;
+	background-color: white;
+	padding: 20px;
+	margin: 40px;
+	border-radius: 15px;
+}
+input { 
+width: 100px; 
+}
+input.form, a {
+  width: 100px;
+  display: inline-block;
+  background-color: maroon;
+  border: 1px solid maroon;
+  color: white;
+  text-decoration: none;
+  font-size: 12px;
+  border-radius: 5px;
+  padding: 5px;  		
+} 
+input.form:hover {
+  cursor: pointer;
+} 
+
+a:hover {
+  cursor: pointer;
+} 
+#multChoice, #trueFalse, #shortAns { 
+  display: none;
+} 
+button {
+  border: 2px solid maroon;
+  background-color: maroon;
+  font-family: Verdana, Geneva, sans-serif;
+  color: white;
+  font-size: 15px;
+  border-radius: 5px;
+} 
+button:hover {
+  cursor: pointer;
+  box-shadow: 
+}
+button:focus {
+  outline: 0;
+}
+
+
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+
+}
+table, th, td {
+  border: 1px solid black;
+}
+td { 
+  margin: 0 10px;
+}
+th {
+  font-weight: bold;
+  margin: 5px;
+}
