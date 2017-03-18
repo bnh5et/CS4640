@@ -207,7 +207,7 @@ public class assign4 extends HttpServlet {
 		out.println("  </div>");
 		out.println("    <form>");
 		out.println("    <!-- TODO one button to go to form from assign3, one to create game-->");
-		out.println("      <a class=\"form\" style=\"width: 100px;\" href=\"http://localhost:8082/cs4640/assignment4/jeopardy.php\">Add More Q/A</a>");
+		out.println("      <a class=\"form\" style=\"width: 100px;\" href=\"http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php\">Add More Q/A</a>");
 		out.println("      <input class=\"form\" type=\"submit\" name=\"submit\" value=\"Create Game\" style=\"width: 100px;\">");
 		out.println("    ");
 		out.println("    </form>");
@@ -226,7 +226,6 @@ public class assign4 extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//this is for the submit button
-		
 		try 
 		{
 			PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
