@@ -30,9 +30,6 @@ public class assign4 extends HttpServlet {
 
 	ArrayList<String> questions = new ArrayList<String>();
 	ArrayList<String> answers = new ArrayList<String>();
-	ArrayList<Integer> row = new ArrayList<Integer>();
-	ArrayList<Integer> column = new ArrayList<Integer>();
-	ArrayList<Integer> score = new ArrayList<Integer>();
     
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -63,9 +60,9 @@ public class assign4 extends HttpServlet {
 		{
 			if (reader.hasNextLine())
 			{
-			//if (!reader.nextLine().equals("Question: "))
-			questions.add(reader.nextLine());
-			answers.add(reader.nextLine());
+				//if (!reader.nextLine().equals("Question: "))
+				questions.add(reader.nextLine());
+				answers.add(reader.nextLine());
 			}
 		}
 		
@@ -187,27 +184,38 @@ public class assign4 extends HttpServlet {
 		out.println("              Score");
 		out.println("            </th>");
 		out.println("          </tr>");
-		out.println("          <tr>");
-		out.println("            <td>");
-		out.println("              <p style=\"font-weight: bold; padding: 0;\">Question:<p>");
-		out.println("              <p style=\"font-weight: bold; padding: 0;\">Answer:<p> ");
-		out.println("            </td>");
-		out.println("            <td>");
-		out.println("              <input type=\"text\" name=\"rowNum\">  ");
-		out.println("            </td>");
-		out.println("            <td>");
-		out.println("              <input type=\"text\" name=\"colNum\"> ");
-		out.println("            </td>");
-		out.println("            <td>");
-		out.println("              <input type=\"text\" name=\"score\">");
-		out.println("            </td>");
-		out.println("          </tr>");
+		
+		for (int i = 0; i < count/2; i++) {
+			out.println("          <tr>");
+			out.println("            <td>");
+			out.println("              <p style=\"font-weight: bold; padding: 0;\">Question:<p>");
+			out.print(questions.get(i));
+			out.println("              <p style=\"font-weight: bold; padding: 0;\">Answer:<p> ");
+			out.print(answers.get(i));
+			out.println("            </td>");
+			out.println("            <td>");
+			out.println("              <input id=\"rowNum");
+			out.print(i);
+			out.println("\" type=\"text\" name=\"row\">  ");
+			out.println("            </td>");
+			out.println("            <td>");
+			out.println("              <input id=\"colNum");
+			out.print(i);
+			out.println("\" type=\"text\" name=\"col\">  ");
+			out.println("            </td>");
+			out.println("            <td>");
+			out.println("              <input id=\"score");
+			out.print(i);
+			out.println("\" type=\"text\" name=\"score\">  ");
+			out.println("            </td>");
+		}
+		
 		out.println("        </table>");
 		out.println("        <br/>");
 		out.println("  </div>");
-		out.println("    <form>");
+		out.println("    <form method=\"POST\">");
 		out.println("    <!-- TODO one button to go to form from assign3, one to create game-->");
-		out.println("      <a class=\"form\" style=\"width: 100px;\" href=\"http://plato.cs.virginia.edu/~bnh5et/HW/jeopardy.php\">Add More Q/A</a>");
+		out.println("      <a class=\"form\" style=\"width: 100px;\" href=\"http://localhost:8082/cs4640/assignment4/jeopardy.php\">Add More Q/A</a>");
 		out.println("      <input class=\"form\" type=\"submit\" name=\"submit\" value=\"Create Game\" style=\"width: 100px;\">");
 		out.println("    ");
 		out.println("    </form>");
@@ -225,12 +233,23 @@ public class assign4 extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//this is for the submit button
+		//this is for the submit button	
+		
+		String[] row = request.getParameterValues("row");
+		String[] column = request.getParameterValues("col");
+		String[] score = request.getParameterValues("score");
+		
+		System.out.println(row.length);
+		
+		//Check for errors 
+		
 		try 
 		{
 			PrintWriter writer = new PrintWriter("submission.txt", "UTF-8");
 			// TODO dummy strings for question, answer, row, column, score
-			writer.println("Question" + "; " + "Answer" + "; " + "row" + "; " + "column" + "; " + "score" );
+			for(int i = 0; i < questions.size(); i++) {
+				writer.println(questions.get(i) + "; " + answers.get(i) + "; " + row[i] + "; " + column[i] + "; " + score[i] );
+			}
 			writer.close();
 		} 
 		catch (IOException e) 
@@ -252,19 +271,21 @@ public class assign4 extends HttpServlet {
 			//figure out how many rows and columns we need
 			int maxrows = 0;
 			int maxcols = 0;
-			for (int i = 0; i < row.size(); i++)
+			for (int i = 0; i < row.length; i++)
 			{
-				if (row.get(i) > maxrows)
+				int rowInt = Integer.parseInt(row[i]);
+				if (rowInt > maxrows)
 				{
-					maxrows = row.get(i);
+					maxrows = rowInt;
 				}
 			}
 			
-			for (int i = 0; i < column.size(); i++)
+			for (int i = 0; i < column.length; i++)
 			{
-				if (column.get(i) > maxcols)
+				int colInt = Integer.parseInt(column[i]);
+				if (colInt > maxcols)
 				{
-					maxcols = column.get(i);
+					maxcols = colInt;
 				}
 			}
 			
@@ -272,13 +293,9 @@ public class assign4 extends HttpServlet {
 			
 			response.setContentType("text/html");
 			PrintWriter jeopardyWriter = response.getWriter();
-		
-			String str;
-			Enumeration input = request.getParameterNames();
-		
+
 			jeopardyWriter.println("<html>");
-			//TODO and so on, to create rest of jeopardy grid
-			
+			/*
 			while (input.hasMoreElements())
 			{
 				str = (String) input.nextElement();
@@ -294,6 +311,8 @@ public class assign4 extends HttpServlet {
 					//we want the score in the grid, that is all
 				}
 			}
+			*/
+			//TODO and so on, to create rest of jeopardy grid
 			//closing html tags to jeopardyWriter
 			jeopardyWriter.println("</html>");
 			jeopardyWriter.close();
