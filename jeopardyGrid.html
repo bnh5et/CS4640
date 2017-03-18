@@ -45,6 +45,15 @@
       color: white;
       background-color: maroon;
     }
+    table {
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+    td {
+      width: 100px;
+      height: 60px;
+      text-align: center;
+    }
   </style>
 
 </head>
@@ -54,16 +63,19 @@
     <h1>Jeopardy!</h1>  
     <h4>Briana Hart and Samantha Pitcher</h4>
 
-        <!-- score table -->
         <table>
-          <tr>
-            <td>Score here</td>
-          </tr>
-            
-
-            
+          for (int i = 0; i < maxrow; i++) {
+            <tr>
+            for (int j = 0; j < maxcol; j++) {
+              <td>
+                if(row[i] && col[j]) {
+                  row[i];
+                }
+              </td>
+            }
+            </tr>
+          }
         </table>
-        
         
     <br/>
     <br/>
