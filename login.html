@@ -1,0 +1,138 @@
+ <html>
+  <head>
+   <title>Jeopardy!</title>
+   
+   <style>
+            body {
+        font-family:  Verdana, Geneva, sans-serif;
+               background-color:  SlateGrey;
+               }
+               div {
+               box-shadow:  0 0 5px;
+               background-color:  white;
+               padding:  20px;
+               margin:  40px;;
+               border-radius:  15px;
+               }
+
+      
+		input { 
+		width: 100px; 
+		}
+		input.form, a {
+		  width: 100px;
+		  display: inline-block;
+		  background-color: maroon;
+		  border: 1px solid maroon;
+		  color: white;
+		  text-decoration: none;
+		  font-size: 12px;
+		  border-radius: 5px;
+		  padding: 5px;  		
+		} 
+		input.form:hover {
+		  cursor: pointer;
+		} 
+		
+		a:hover {
+		  cursor: pointer;
+		} 
+		button {
+		  border: 2px solid maroon;
+		  background-color: maroon;
+		  font-family: Verdana, Geneva, sans-serif;
+		  color: white;
+		  font-size: 15px;
+		  border-radius: 5px;
+		} 
+		button:hover {
+		  cursor: pointer;
+		  box-shadow: 
+		}
+		button:focus {
+		  outline: 0;
+		}
+		table {
+		  border-collapse: collapse;
+		  table-layout: fixed;
+		
+		}
+		table, th, td {
+		  border: 1px solid black;
+		}
+		td { 
+		  margin: 0 10px;
+		}
+		th {
+		  font-weight: bold;
+		  margin: 5px;
+		}
+   </style>
+
+      </head>
+
+      <body onLoad=\"setFocus()\" >
+      <b><center><h1>Samantha Pitcher and Briana Hart's Jeopardy!<h1></center></b>
+   
+      <br/><br/>
+      
+  <!--    if (invalidID)
+      {  // called from doPost(), invalid ID entered.
+         invalidID = false;
+         out.println("<br><font color=\"red\">Invalid user ID, password pair. Please try again.</font><br><br>");
+      }      
+            
+      // Returning users -->
+      <div id=returningUser>
+      <form method=\"post\"
+              action=\"" + LoginServlet + "\" id=\"form1\" name=\"form1\">                     
+        <table Cellspacing=\"0\" Cellpadding=\"3\" Border=\"0\" >
+          <tr><td colspan=\"4\"><b>Returning Users:</b></td></tr>
+          <tr>
+            <td>UserID:</td>
+            <td><input autofocus type=\"text\" name=\"UserID\" size=\"15\" maxLength=\"20\"><td>
+            <td>Password:</td>
+            <td><input type=\"password\" name=\"pwd\" size=\"15\" maxlength=\"20\"></td>
+          </tr>
+          <tr>
+            <td colspan=\"4\" ><input type="submit" value="Log in" name="btn"></input
+          </tr>
+            </table>
+      </form>
+          </div>
+      
+      <br />
+      <br />
+      <br />
+      <div id=registerNewUser>
+      <form method=\"post\"
+              action=\"" + LoginServlet + "\" id=\"form2\" name=\"form2\">                      
+        <table>
+          <tr><td><b>Register New User:</b></td></tr>
+          <tr>
+            <td>UserID:</td>
+            <td><input type=\"text\" name=\"newUserID\"></td>
+            <td>Contact E-mail:</td>
+            <td><input type=\"text\" name=\"email\"></td>
+          </tr>
+          <tr>
+            <td>Password:</td>
+            <td><input type=\"password\" name=\"newPwd\" size=\"15\" maxlength=\"20\"></td>      
+            <td>Confirm Password:</td>
+            <td><input type=\"password\" name=\"confirmPwd\" size=\"15\" maxlength=\"20\"></td>
+          </tr>
+          <tr>
+            <td colspan=\"4\"><input type=\"submit\" value=\"Register\" name=\"btn\"></input
+          </tr>
+        </table>     
+      </form>
+          </div>
+      
+      <br />
+      <hr />
+      <br />
+      <a href=\"" + classWebsite + "\">CS4640 &mdash; class website</a>
+      <br />
+      
+      </body>
+      </html>
