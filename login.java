@@ -12,17 +12,11 @@ public class login extends HttpServlet {
 	private static final long serialVersionUID = 2L;
 
 	// **** setting for local ****/
-	private static String LoginServlet = "http://localhost:8080/cs4640/login";
-	private static String SurveyServlet = "http://localhost:8080/cs4640/survey";
-
-	private static String classWebsite = "http://www.cs.virginia.edu/upsorn/cs4640/";
+	private static String LoginServlet = "http://localhost:8080/Jeopardy/login";
+	private static String BrowseServlet = "http://localhost:8080/Jeopardy/browse";
 
 	// a data file containing username and password
-	// note: this is a simple login information without encryption.
-	// In reality, credential must be encrypted for security purpose
 	public static String user_info = "/Applications/apache/webapps/cs4640/WEB-INF/data/user-info.txt";
-
-	public static String survey_info = "/Applications/apache/webapps/cs4640/WEB-INF/data/survey-info.txt";
 
 	// Form parameters.
 	private static String btn;
@@ -41,7 +35,6 @@ public class login extends HttpServlet {
 	private int number_attempts = 0;
 
 	/**
-	 * ***************************************************** Overrides
 	 * HttpServlet's doGet(). prints the login form.
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -122,11 +115,6 @@ public class login extends HttpServlet {
 		out.println("			<h4>Briana Hart and Samantha Pitcher</h4>");
 		out.println("			<br/>");
 
-		if (invalidID) { // called from doPost(), invalid ID entered.
-			invalidID = false;
-			out.println("<br><font color=\"red\">Invalid user ID, password pair. Please try again.</font><br><br>");
-		}
-
 		// Returning users
 		out.println("<form method=\"post\"");
 		out.println("        action=\"" + LoginServlet + "\" id=\"form1\" name=\"form1\">");
@@ -134,12 +122,18 @@ public class login extends HttpServlet {
 		out.println("				<table>");
 		out.println("					<tr>");
 		out.println("						<td>UserID:</td>");
-		out.println("						<td><input type=\"text\" name=\"userId\"></td>");
+		out.println("						<td><input type=\"text\" name=\"UserID\"></td>");
 		out.println("						<td>Password:</td>");
 		out.println("						<td><input type=\"password\" name=\"pwd\"></td>");
 		out.println("					</tr>");
 		out.println("				</table>");
 		out.println("				<br/>");
+		
+		if (invalidID) {
+			invalidID = false;
+			out.println("<br><font color=\"red\">Invalid user ID, password pair. Please try again.</font><br><br>");
+		}
+		
 		out.println("				<input class=\"btn\" type=\"submit\" value=\"Log in\" name=\"btn\">");
 		out.println("			</form>");
 
@@ -174,13 +168,6 @@ public class login extends HttpServlet {
 		out.close();
 	}
 
-	/*******************************************************
-	 * Overrides HttpServlet's doPost().
-	 * 
-	 * // assume an account will locked after 3 failed attempts // write code to
-	 * check and handle this business logic // (optional)
-	 ********************************************************* 
-	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(true);
 
@@ -194,8 +181,6 @@ public class login extends HttpServlet {
 		confirmPwd = request.getParameter("confirmPwd");
 		email = request.getParameter("email");
 
-		// need a more sophisticated input validation (not implemented yet)
-
 		if (btn.equals("Register")) {
 			if (newPwd.equals(confirmPwd) && newUserID.length() > 0 && newPwd.length() > 0 && email.length() > 0) {
 				registerNewUser(newUserID, newPwd, email);
@@ -204,17 +189,13 @@ public class login extends HttpServlet {
 			}
 		}
 
-		if (isValid(userID, pwd)) { // successful
+		if (isValid(userID, pwd)) {
 			session.setAttribute("isLogin", "Yes");
 			session.setAttribute("UserID", userID);
 
-			response.sendRedirect(SurveyServlet);
+			response.sendRedirect(BrowseServlet);
 
-			// for URL rewriting
-			// String url_with_param = SurveyServlet + "?uid=" + userID;
-			// response.sendRedirect(url_with_param);
-
-		} else { // unsuccessful
+		} else {
 			session.setAttribute("isLogin", "No");
 			session.setAttribute("UserID", "");
 
@@ -256,14 +237,6 @@ public class login extends HttpServlet {
 
 		} catch (Exception e) {
 			System.out.println("Unable to verify the user information ");
-
-			// One potential cause of this exception is the path to the data
-			// file
-			// To verify, open the data file in a web browser
-			// Use the path you saw in the browser's address bar to access the
-			// data file
-			// (note: excluding "file:///")
-
 		}
 
 		return is_valid;
