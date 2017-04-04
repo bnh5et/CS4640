@@ -32,7 +32,7 @@ public class login extends HttpServlet {
 	// doPost() tells doGet() when the login is invalid.
 	private static boolean invalidID = false;
 
-	private int number_attempts = 0;
+	private int number_attempts = 5;
 
 	/**
 	 * HttpServlet's doGet(). prints the login form.
@@ -128,19 +128,34 @@ public class login extends HttpServlet {
 		out.println("					</tr>");
 		out.println("				</table>");
 		out.println("				<br/>");
-		
+
 		if (invalidID) {
 			invalidID = false;
 			out.println("<br><font color=\"red\">Invalid user ID, password pair. Please try again.</font><br><br>");
+			number_attempts--;
+			out.println("<font color=\"red\">You have " + number_attempts + " attempts left before you're locked out.</font><br><br>");
 		}
+
+		out.println("				<input class=\"btn\" type=\"submit\" value=\"Log in\" name=\"btn\" ");
 		
-		out.println("				<input class=\"btn\" type=\"submit\" value=\"Log in\" name=\"btn\">");
+		if (number_attempts < 0) {
+			out.println("disabled");
+			try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			number_attempts = 5;
+		}
+				
+		out.println(">");
 		out.println("			</form>");
 
 		// Register new user
 		out.println("<form method=\"post\"");
 		out.println("        action=\"" + LoginServlet + "\" id=\"form2\" name=\"form2\">");
-		
+
 		out.println("				<h2>New User</h2>");
 		out.println("				<table>");
 		out.println("					<tr>");
