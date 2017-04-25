@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.Scanner;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +34,7 @@ public class CreateGrid extends HttpServlet {
 
 	private static String LogoutServlet = "http://localhost:8080/Jeopardy/logout";
 	private static String LoginServlet = "http://localhost:8080/Jeopardy/login";
+	private static String BrowseServlet = "http://localhost:8080/Jeopardy/browse";
 
 	private String user;
 
@@ -53,18 +55,17 @@ public class CreateGrid extends HttpServlet {
 
 		if (user == null || user.length() == 0)
 			response.sendRedirect(LoginServlet);
-		
-		if(session.getAttribute("updated") != null){
-			updated = (boolean) session.getAttribute("updated");
 
+		if (session.getAttribute("updated") != null) {
+			updated = (boolean) session.getAttribute("updated");
+			session.setAttribute("updated", false);
 		}
 
 		if (updated) {
 			gameID = (Integer) session.getAttribute("GameNum");
-			System.out.println("Updating: " + gameID);
 		}
 
-		//Making Questions and Answers Arrays
+		// Making Questions and Answers Arrays
 		URL url = new URL("http://plato.cs.virginia.edu/~bnh5et/HW/data/data.txt");
 		Scanner scanner = new Scanner(url.openStream());
 
@@ -87,7 +88,7 @@ public class CreateGrid extends HttpServlet {
 			}
 		}
 
-		//Print Questions
+		// Print Questions
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		printQuestions(out);
@@ -144,7 +145,6 @@ public class CreateGrid extends HttpServlet {
 		out.println("input[type=submit]:hover {");
 		out.println("	cursor: pointer;");
 		out.println("}");
-		out.println("");
 		out.println("a:hover {");
 		out.println("  cursor: pointer;");
 		out.println("} ");
@@ -166,12 +166,9 @@ public class CreateGrid extends HttpServlet {
 		out.println("button:focus {");
 		out.println("  outline: 0;");
 		out.println("}");
-		out.println("");
-		out.println("");
 		out.println("table {");
 		out.println("  border-collapse: collapse;");
 		out.println("  table-layout: fixed;");
-		out.println("");
 		out.println("}");
 		out.println("table, th, td {");
 		out.println("  border: 1px solid black;");
@@ -308,8 +305,8 @@ public class CreateGrid extends HttpServlet {
 				maxcols = colInt;
 			}
 		}
-		
-		//Set Scores Array
+
+		// Set Scores Array
 		scores = new int[maxrows][maxcols];
 
 		for (int i = 0; i < row.length; i++) {
@@ -323,6 +320,10 @@ public class CreateGrid extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		printBoard(out);
+		
+		if(request.getParameterValues("browse") != null){
+			response.sendRedirect(BrowseServlet);
+		}
 	}
 
 	public void printBoard(PrintWriter out) {
@@ -333,41 +334,71 @@ public class CreateGrid extends HttpServlet {
 		out.println("<title>Jeopardy</title>");
 		out.println("");
 		out.println("  <style>");
-		out.println("    body {");
-		out.println("      font-family: Verdana, Geneva, sans-serif;");
-		out.println("      background-color: SlateGrey;");
-		out.println("    }");
-		out.println("    div {");
-		out.println("      box-shadow: 0 0 5px;");
-		out.println("      background-color: white;");
-		out.println("      padding: 20px;");
-		out.println("      margin: 40px;");
-		out.println("      border-radius: 15px;");
-		out.println("    }");
-		out.println("    a:hover {");
-		out.println("      background-color: yellow; ");
-		out.println("    } ");
-		out.println("    input {");
-		out.println("      width: 100px;       ");
-		out.println("    }  ");
-		out.println("    #multChoice, #trueFalse, #shortAns { ");
-		out.println("      display: none;");
-		out.println("    } ");
-		out.println("    button {");
-		out.println("      border: 2px solid maroon;");
-		out.println("      background-color: maroon;");
-		out.println("      font-family: Verdana, Geneva, sans-serif;");
-		out.println("      color: white;");
-		out.println("      font-size: 15px;");
-		out.println("      border-radius: 5px;");
-		out.println("    } ");
-		out.println("    button:hover {");
-		out.println("      cursor: pointer;");
-		out.println("      box-shadow: ");
-		out.println("    }");
-		out.println("    button:focus {");
-		out.println("      outline: 0;");
-		out.println("    }");
+		out.println("body {");
+		out.println("	font-family: Verdana, Geneva, sans-serif;");
+		out.println("	background-color: SlateGrey;");
+		out.println("}");
+		out.println("div {");
+		out.println("	box-shadow: 0 0 5px;");
+		out.println("	background-color: white;");
+		out.println("	padding: 20px;");
+		out.println("	margin: 40px;");
+		out.println("	border-radius: 15px;");
+		out.println("}");
+		out.println("input { ");
+		out.println("width: 15px; ");
+		out.println("}");
+		out.println("input.form, a {");
+		out.println("  width: 100px;");
+		out.println("  display: inline-block;");
+		out.println("  background-color: maroon;");
+		out.println("  border: 1px solid maroon;");
+		out.println("  color: white;");
+		out.println("  text-decoration: none;");
+		out.println("  font-size: 12px;");
+		out.println("  border-radius: 5px;");
+		out.println("  padding: 5px;  		");
+		out.println("} ");
+		out.println("input.form:hover {");
+		out.println("  cursor: pointer;");
+		out.println("} ");
+		out.println("input[type=submit] {");
+		out.println("	width: 50px;");
+		out.println("	display: inline-block;");
+		out.println("	background-color: maroon;");
+		out.println("	border: 1px solid maroon;");
+		out.println("	color: white;");
+		out.println("	text-decoration: none;");
+		out.println("	font-size: 12px;");
+		out.println("	border-radius: 5px;");
+		out.println("	padding: 5px;");
+		out.println("}");
+		out.println("input[type=submit]:hover {");
+		out.println("	cursor: pointer;");
+		out.println("}");
+		out.println("a:hover {");
+		out.println("  cursor: pointer;");
+		out.println("} ");
+		out.println("#multChoice, #trueFalse, #shortAns { ");
+		out.println("  display: none;");
+		out.println("} ");
+		out.println("button {");
+		out.println("  border: 2px solid maroon;");
+		out.println("  background-color: maroon;");
+		out.println("  font-family: Verdana, Geneva, sans-serif;");
+		out.println("  color: white;");
+		out.println("  font-size: 15px;");
+		out.println("  border-radius: 5px;");
+		out.println("  width: 100px;");
+		out.println("} ");
+		out.println("button:hover {");
+		out.println("  cursor: pointer;");
+		out.println("  box-shadow: ");
+		out.println("}");
+		out.println("button:focus {");
+		out.println("  outline: 0;");
+		out.println("}");
+		
 		out.println("    table, th, td {");
 		out.println("      border: 1px solid black;  ");
 		out.println("      color: white;");
@@ -403,13 +434,13 @@ public class CreateGrid extends HttpServlet {
 			}
 			out.println("            </tr>");
 		}
+		
 		out.println("        </table>");
-		out.println("        ");
 		out.println("    <br/>");
 		out.println("    <br/>");
+		out.println("      <input style=\"width: 100px;\" type=\"submit\" value=\"Back\" onclick=\"window.history.back()\">");
+		out.println("		<input style=\"width: 100px;\" type=\"submit\" value=\"Browse Games\" onclick=\"location.href='" + BrowseServlet + "';\"></input>");	
 		out.println("  </div>");
-		out.println("      <input type=\"reset\" name=\"reset\" value=\"Back\" onclick=\"window.history.back()\">");
-		out.println("    </form>");
 		out.println("  </div>");
 		out.println("</center>");
 		out.println("</body>");
@@ -427,10 +458,8 @@ public class CreateGrid extends HttpServlet {
 			while (sc.hasNext()) {
 				nl = sc.nextLine();
 				String[] parsedLine = nl.split(";");
-				if(Integer.parseInt(parsedLine[0]) >= maxGameID){
-					System.out.println("Game ID: " + Integer.parseInt(parsedLine[0]));
+				if (Integer.parseInt(parsedLine[0]) >= maxGameID) {
 					maxGameID = Integer.parseInt(parsedLine[0]) + 1;
-					System.out.println("Max Game ID: " + maxGameID);
 				}
 			}
 			sc.close();
@@ -438,10 +467,10 @@ public class CreateGrid extends HttpServlet {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		if(maxGameID > 0){
+		if (maxGameID > 0) {
 			gameID = maxGameID;
 		}
-		
+
 		try {
 			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.txt", true);
 
@@ -460,46 +489,47 @@ public class CreateGrid extends HttpServlet {
 		try {
 			File file = new File("/Users/brianahart/Documents/submission.txt");
 			Scanner sc = new Scanner(file);
-			String nl = "";	
+			String nl = "";
 			int count = 0;
-			
-			while(sc.hasNext()) {
+
+			while (sc.hasNext()) {
 				nl = sc.nextLine();
-				if(nl.contains(";")){
+				if (nl.contains(";")) {
 					count++;
 				}
 			}
 			sc.close();
-			
-			ArrayList<String> newFile =	new ArrayList<String>();		
+
+			ArrayList<String> newFile = new ArrayList<String>();
 			Scanner scanner = new Scanner(file);
 			String line = "";
 			int k = 0;
-			
-			for(int i = 0; i < count; i++){
+
+			for (int i = 0; i < count; i++) {
 				nl = scanner.nextLine();
 				String[] parsedLine = nl.split(";");
-				
-				if(Integer.parseInt(parsedLine[0]) != gameID) {
+
+				if (Integer.parseInt(parsedLine[0]) != gameID) {
 					newFile.add(nl);
-				} 
-			}		
+				}
+			}
 			scanner.close();
-			
-			for(int i = 0; i < questions.size(); i++) {
-				newFile.add(gameID + ";" + user + ";" + questions.get(i) + ";" + answers.get(i) + ";" + row[i] + ";" + column[i] + ";" + score[i]);
+
+			for (int i = 0; i < questions.size(); i++) {
+				newFile.add(gameID + ";" + user + ";" + questions.get(i) + ";" + answers.get(i) + ";" + row[i] + ";"
+						+ column[i] + ";" + score[i]);
 			}
 
 			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.txt");
-			
-			for (int i = 0; i < count; i++){
-				if(newFile.get(i) != null){
+
+			for (int i = 0; i < count; i++) {
+				if (newFile.get(i) != null) {
 					fw.write(newFile.get(i));
 					fw.write("\n");
 				}
-			}		
+			}
 			fw.close();
-			
+
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
