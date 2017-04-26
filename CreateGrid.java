@@ -426,7 +426,9 @@ public class CreateGrid extends HttpServlet {
 		for (int i = 0; i < maxrows; i++) {
 			out.println("            <tr>");
 			for (int j = 0; j < maxcols; j++) {
-				out.println("              <td>");
+				out.println("              <td id=\"" + i + j 
+						+ "\" onclick=\"alert('you clicked the table at (" + i + ", " + j + ") " + 
+						 "')\">");
 				if (scores[i][j] != 0) {
 					out.println(scores[i][j]);
 				}
