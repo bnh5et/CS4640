@@ -1,3 +1,5 @@
+package Jeopardy;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.net.URL;
@@ -21,6 +24,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Servlet implementation class createGrid
@@ -286,7 +304,12 @@ public class CreateGrid extends HttpServlet {
 		if (updated) {
 			updateGame();
 		} else {
-			createGame();
+			try {
+				createGame();
+			} catch (ParserConfigurationException | SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// Calculate Max Rows and Max Cols
@@ -320,8 +343,8 @@ public class CreateGrid extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		printBoard(out);
-		
-		if(request.getParameterValues("browse") != null){
+
+		if (request.getParameterValues("browse") != null) {
 			response.sendRedirect(BrowseServlet);
 		}
 	}
@@ -398,7 +421,7 @@ public class CreateGrid extends HttpServlet {
 		out.println("button:focus {");
 		out.println("  outline: 0;");
 		out.println("}");
-		
+
 		out.println("    table, th, td {");
 		out.println("      border: 1px solid black;  ");
 		out.println("      color: white;");
@@ -426,9 +449,10 @@ public class CreateGrid extends HttpServlet {
 		for (int i = 0; i < maxrows; i++) {
 			out.println("            <tr>");
 			for (int j = 0; j < maxcols; j++) {
-				out.println("              <td id=\"" + i + j 
-						+ "\" onclick=\"alert('you clicked the table at (" + i + ", " + j + ") " + 
-						 "')\">");
+
+				// puts score in the box and makes clickable
+				out.println("              <td id=\"" + i + j + "\" onclick=\"alert('you clicked the table at (" + i
+						+ ", " + j + ") " + "')\">");
 				if (scores[i][j] != 0) {
 					out.println(scores[i][j]);
 				}
@@ -436,12 +460,15 @@ public class CreateGrid extends HttpServlet {
 			}
 			out.println("            </tr>");
 		}
-		
+
 		out.println("        </table>");
 		out.println("    <br/>");
 		out.println("    <br/>");
-		out.println("      <input style=\"width: 100px;\" type=\"submit\" value=\"Back\" onclick=\"window.history.back()\">");
-		out.println("		<input style=\"width: 100px;\" type=\"submit\" value=\"Browse Games\" onclick=\"location.href='" + BrowseServlet + "';\"></input>");	
+		out.println(
+				"      <input style=\"width: 100px;\" type=\"submit\" value=\"Back\" onclick=\"window.history.back()\">");
+		out.println(
+				"		<input style=\"width: 100px;\" type=\"submit\" value=\"Browse Games\" onclick=\"location.href='"
+						+ BrowseServlet + "';\"></input>");
 		out.println("  </div>");
 		out.println("  </div>");
 		out.println("</center>");
@@ -450,12 +477,13 @@ public class CreateGrid extends HttpServlet {
 		out.println("</html>");
 	}
 
-	public void createGame() {
-		File file = new File("/Users/brianahart/Documents/submission.txt");
+	public void createGame() throws ParserConfigurationException, SAXException {
+		File file = new File("/Users/Samantha/submission.txt");
 		Scanner sc;
 		String nl = "";
 
 		try {
+			// find the max gameid
 			sc = new Scanner(file);
 			while (sc.hasNext()) {
 				nl = sc.nextLine();
@@ -472,24 +500,121 @@ public class CreateGrid extends HttpServlet {
 		if (maxGameID > 0) {
 			gameID = maxGameID;
 		}
+		int existSubmission = 0;
 
 		try {
-			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.txt", true);
+			// THIS IS WHERE WE WRITE TO FILE
+			if (new File("/Users/Samantha/submission2.txt").isFile())
+				existSubmission++;
+			FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", true);
 
-			for (int i = 0; i < questions.size(); i++) {
-				fw.write(gameID + ";" + user + ";");
-				fw.write(questions.get(i) + ";" + answers.get(i) + ";" + row[i] + ";" + column[i] + ";" + score[i]
-						+ "\n");
+			// want this one time
+			if (existSubmission == 0) {
+				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n");
 			}
+			fw.write("<jeopardy>\n");
+			fw.write("  <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
+			for (int i = 0; i < questions.size(); i++) 
+			{
+				fw.write("   <question>\n");
+				fw.write("    <q>" + questions.get(i) + "</q>\n");
+				fw.write("    <answer>" + answers.get(i) + "</answer>\n");
+				fw.write("    <row>" + row[i] + "</row>\n");
+				fw.write("    <col>" + column[i] + "</col>\n");
+				fw.write("    <score>" + score[i] + "</score>\n");
+				fw.write("   </question>\n");
+			}
+			fw.write("  </game>\n");
+			fw.write("</jeopardy>\n");
+
 			fw.close();
+			try {
+				parseXML();
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
 	}
 
+	
+	
+	public void parseXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {// reads
+																													// and
+																													// prints
+		//stuff to read file																					// xml
+		File xml = new File("/Users/Samantha/submission2.txt");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		org.w3c.dom.Document doc = builder.parse(xml);
+		doc.getDocumentElement().normalize();
+		
+		//
+		String root = doc.getDocumentElement().getNodeName();
+		NodeList nodeList_games = doc.getElementsByTagName("game");
+		NodeList nodeList_questions;
+		//In list of games
+		for (int i = 0; i < nodeList_games.getLength(); i++)
+		{
+			//gets list of questions
+			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
+			
+			for (int j = 0; j < nodeList_questions.getLength(); j++)
+			{
+				//get q, a, row, col, score
+				System.out.println("number of questions " + nodeList_questions.getLength());
+				Node q = nodeList_questions.item(j);
+				System.out.println(q.getNodeName());
+				NodeList nodeList_q = q.getChildNodes();
+				for (int k = 0; k < nodeList_q.getLength(); k++)
+				{
+					//System.out.println(nodeList_q.item(k).getNodeName());
+					System.out.println(nodeList_q.item(k).getTextContent());
+				}
+//				Element el = (Element)nodeList_questions.item(j);
+//				String val = el.getElementsByTagName("q").item(0).getTextContent();
+				//System.out.println(val);
+			}	
+		}	
+		//System.out.println(ele.toString());
+//		NodeList game = ele.getChildNodes();
+//		if (game != null)
+//		{
+//			//System.out.println();
+//			//Element answer = (Element) game.getElementsByTagName("answer"));
+//			
+//			int length = game.getLength();
+//			for (int i = 0; i < length; i++)
+//			{
+//				Node node = game.item(i);
+//				if (game.item(i).getNodeType() == Node.ELEMENT_NODE)
+//				{
+//					Element question = (Element) node;
+//					question.getElementsByTagName("question");
+//					System.out.println(game.item(i).getNodeName());
+//				}
+//			}
+//			
+
+			
+		}
+		// printDocument(doc, System.out);
+//		System.out.println("Root element:  " + doc.getDocumentElement().getNodeName());
+
+		// use to print whole doc
+		/*DOMSource domsource = new DOMSource(doc);
+		StringWriter writer = new StringWriter();
+		StreamResult result = new StreamResult(writer);
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer t = tf.newTransformer();
+		t.transform(domsource, result);
+		// System.out.println(writer.toString());*/
+	
+
 	public void updateGame() {
 		try {
-			File file = new File("/Users/brianahart/Documents/submission.txt");
+			File file = new File("/Users/Samantha/submission.txt");
 			Scanner sc = new Scanner(file);
 			String nl = "";
 			int count = 0;
@@ -522,7 +647,7 @@ public class CreateGrid extends HttpServlet {
 						+ column[i] + ";" + score[i]);
 			}
 
-			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.txt");
+			FileWriter fw = new FileWriter("/Users/Samantha/submission.txt");
 
 			for (int i = 0; i < count; i++) {
 				if (newFile.get(i) != null) {
