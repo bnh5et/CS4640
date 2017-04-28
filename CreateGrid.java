@@ -4,10 +4,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
@@ -36,6 +38,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -500,19 +503,20 @@ public class CreateGrid extends HttpServlet {
 		if (maxGameID > 0) {
 			gameID = maxGameID;
 		}
-		int existSubmission = 0;
+		boolean existSubmission = false;
 
 		try {
 			// THIS IS WHERE WE WRITE TO FILE
 			if (new File("/Users/Samantha/submission2.txt").isFile())
-				existSubmission++;
+				existSubmission = true;
 			FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", true);
 
 			// want this one time
-			if (existSubmission == 0) {
+			if (!existSubmission) {
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n");
+				fw.write("<jeopardy>\n");
 			}
-			fw.write("<jeopardy>\n");
+
 			fw.write("  <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
 			for (int i = 0; i < questions.size(); i++) 
 			{
@@ -525,7 +529,30 @@ public class CreateGrid extends HttpServlet {
 				fw.write("   </question>\n");
 			}
 			fw.write("  </game>\n");
+			//TODO fix this so it only prints at the end 
 			fw.write("</jeopardy>\n");
+
+			//if last line is </jeopardy>, then remove last line
+			if (existSubmission)
+			{
+				//remove last line
+				FileReader readfile = new FileReader("/Users/Samantha/submission2.txt");
+				int counter = 0;
+				Scanner sc2 = new Scanner(readfile);
+				while (sc2.hasNextLine())
+				{
+					counter++;
+					sc2.nextLine();
+				}
+				sc2.close();
+				RandomAccessFile raf = new RandomAccessFile("/Users/Samantha/submission2.txt", "rw");
+				System.out.println("raf.length():  "+ raf.length());
+				System.out.println("counter:  " + counter);
+				raf.setLength(counter - 2);
+				raf.close();
+				fw.write("\n");	
+				
+			}
 
 			fw.close();
 			try {
@@ -540,26 +567,50 @@ public class CreateGrid extends HttpServlet {
 
 	
 	
-	public void parseXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {// reads
-																													// and
-																													// prints
-		//stuff to read file																					// xml
+	public void parseXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
+		// reads and prints	xml
+		//stuff to read file
 		File xml = new File("/Users/Samantha/submission2.txt");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		org.w3c.dom.Document doc = builder.parse(xml);
 		doc.getDocumentElement().normalize();
 		
-		//
 		String root = doc.getDocumentElement().getNodeName();
 		NodeList nodeList_games = doc.getElementsByTagName("game");
 		NodeList nodeList_questions;
 		//In list of games
 		for (int i = 0; i < nodeList_games.getLength(); i++)
 		{
+			NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
+			Node id = userGameId.item(0);
+			Node user = userGameId.item(1);
+			
+			//find maxGameId
+			String idString = id.toString();
+			idString = idString.replace("\"", "");
+			idString = idString.replace("i", "");
+			idString = idString.replace("d", "");
+			idString = idString.replace("=", "");
+			
+			System.out.println("newID:  " + idString);
+
+			if (Integer.parseInt(idString) >= maxGameID)
+			{
+				maxGameID = Integer.parseInt(idString) + 1;
+			}
+			
+			
+			//id.toString() prints id="1"
+			//user.toString() prints user="s"
+			for (int q = 0; q < userGameId.getLength(); q++)
+			{
+				Node myNode = userGameId.item(q);
+				//prints id, then user
+				//System.out.println("this should be user or game id: " + myNode.toString());
+			}
 			//gets list of questions
 			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
-			
 			for (int j = 0; j < nodeList_questions.getLength(); j++)
 			{
 				//get q, a, row, col, score
@@ -569,12 +620,10 @@ public class CreateGrid extends HttpServlet {
 				NodeList nodeList_q = q.getChildNodes();
 				for (int k = 0; k < nodeList_q.getLength(); k++)
 				{
-					//System.out.println(nodeList_q.item(k).getNodeName());
+					//actual question, answer, row, col, score
 					System.out.println(nodeList_q.item(k).getTextContent());
 				}
-//				Element el = (Element)nodeList_questions.item(j);
-//				String val = el.getElementsByTagName("q").item(0).getTextContent();
-				//System.out.println(val);
+
 			}	
 		}	
 		//System.out.println(ele.toString());
@@ -600,6 +649,7 @@ public class CreateGrid extends HttpServlet {
 			
 		}
 		// printDocument(doc, System.out);
+	
 //		System.out.println("Root element:  " + doc.getDocumentElement().getNodeName());
 
 		// use to print whole doc
