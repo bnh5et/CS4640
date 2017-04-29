@@ -1,5 +1,7 @@
 package Jeopardy;
 
+import java.awt.List;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -513,13 +515,17 @@ public class CreateGrid extends HttpServlet {
 
 			// want this one time
 			if (!existSubmission) {
-				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n");
+				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 				fw.write("<jeopardy>\n");
 			}
+			System.out.println("gameID:  " + gameID);
+			System.out.println("user:  " + user);
+			System.out.println("questions.size():  " + questions.size());
 
 			fw.write("  <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
 			for (int i = 0; i < questions.size(); i++) 
 			{
+				System.out.println("got into for loop " + i + " times");
 				fw.write("   <question>\n");
 				fw.write("    <q>" + questions.get(i) + "</q>\n");
 				fw.write("    <answer>" + answers.get(i) + "</answer>\n");
@@ -532,34 +538,71 @@ public class CreateGrid extends HttpServlet {
 			//TODO fix this so it only prints at the end 
 			fw.write("</jeopardy>\n");
 
+			System.out.println("existSubmission:  " + existSubmission);
 			//if last line is </jeopardy>, then remove last line
 			if (existSubmission)
 			{
 				//remove last line
-				FileReader readfile = new FileReader("/Users/Samantha/submission2.txt");
+				/*FileReader readfile = new FileReader("/Users/Samantha/submission2.txt");
 				int counter = 0;
+				ArrayList<String> lines = new ArrayList<String>();
 				Scanner sc2 = new Scanner(readfile);
 				while (sc2.hasNextLine())
 				{
 					counter++;
 					sc2.nextLine();
 				}
-				sc2.close();
-				RandomAccessFile raf = new RandomAccessFile("/Users/Samantha/submission2.txt", "rw");
+				sc2.close();*/
+				/*RandomAccessFile raf = new RandomAccessFile("/Users/Samantha/submission2.txt", "rw");
 				System.out.println("raf.length():  "+ raf.length());
 				System.out.println("counter:  " + counter);
 				raf.setLength(counter - 2);
-				raf.close();
-				fw.write("\n");	
+				raf.close();*/
 				
+				//read in file
+				System.out.println("creating file");
+				String fileName = "/Users/Samantha/submission2.txt";
+				System.out.println("creating arraylist_lines");
+				ArrayList<String> arraylist_lines = new ArrayList<String>();
+				System.out.println("bufferedReader");
+				BufferedReader r = new BufferedReader(new FileReader(fileName));
+				String in;
+				//System.out.println(r.readLine());
+				while ((in = r.readLine()) != null)
+				{
+					System.out.println("you are in while loop");
+					arraylist_lines.add(in);
+					System.out.println("adding to arraylist_lines:  " + in);
+				}
+				r.close();
+	
+				String secondFromBottom = arraylist_lines.get(arraylist_lines.size() - 1);
+				System.out.println("secondFromBottom:  " + secondFromBottom);
+				if (secondFromBottom.matches("</jeopardy>"))
+				{
+					arraylist_lines.remove(arraylist_lines.size() -1);
+					System.out.println("removed arraylist_lines.size() - 1");
+				}
+				fw.close();
+				File fil =  new File("/Users/Samantha/submission2.txt");
+				FileWriter fw2 = new FileWriter(fil, false);
+				for (String line : arraylist_lines)
+				{
+					//puts every line in arraylist_lines in the file
+					fw2.write(line + "\n");
+					//fw2.write("\n");
+				}			
+
+				//fw2.write("\n");	
+				fw2.close();
 			}
 
 			fw.close();
-			try {
-				parseXML();
-			} catch (TransformerException e) {
-				e.printStackTrace();
-			}
+			//try {
+				//parseXML();
+			//} catch (TransformerException e) {
+			//	e.printStackTrace();
+			//}
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
