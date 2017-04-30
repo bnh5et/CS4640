@@ -512,7 +512,6 @@ public class CreateGrid extends HttpServlet {
 		if (maxGameID > 0) {
 			gameID = maxGameID;
 		}
-		//boolean existSubmission = false;
 
 		try 
 		{
@@ -550,7 +549,6 @@ public class CreateGrid extends HttpServlet {
 			fw.write(" </game>\n");
 			fw.write("</jeopardy>\n");
 			fw.close();
-			System.out.println("existSubmission:  " + existSubmission);
 			//if last line is </jeopardy>, then remove last line
 			rmOldJeopardy();
 			//rewrite everything from arraylist_lines to the file
@@ -631,8 +629,6 @@ public class CreateGrid extends HttpServlet {
 			idString = idString.replace("i", "");
 			idString = idString.replace("d", "");
 			idString = idString.replace("=", "");
-			
-			System.out.println("newID:  " + idString);
 
 			if (Integer.parseInt(idString) >= maxGameID)
 			{
