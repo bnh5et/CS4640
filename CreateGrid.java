@@ -1,5 +1,3 @@
-package Jeopardy;
-
 import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -486,40 +484,23 @@ public class CreateGrid extends HttpServlet {
 	}
 
 	public void createGame() throws ParserConfigurationException, SAXException {
-		File file = new File("/Users/Samantha/submission.txt");
-		Scanner sc;
-		String nl = "";
-
-		try {
-			// find the max gameid
-			sc = new Scanner(file);
-			while (sc.hasNext()) {
-				nl = sc.nextLine();
-				String[] parsedLine = nl.split(";");
-				if (Integer.parseInt(parsedLine[0]) >= maxGameID) {
-					maxGameID = Integer.parseInt(parsedLine[0]) + 1;
-				}
-			}
-			sc.close();
-
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		if (maxGameID > 0) {
-			gameID = maxGameID;
-		}
-		//boolean existSubmission = false;
-
+		
 		try 
 		{
+			try {
+				parseXML();
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			}
+			
 			// THIS IS WHERE WE WRITE TO FILE
-			if (new File("/Users/Samantha/submission2.txt").isFile())
+			if (new File("/Users/brianahart/Documents/submission.xml").isFile())
 				existSubmission = true;
 			
 			//check to see if last line is "</jeopardy>" and remove
 			rmOldJeopardy();
 
-			FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", true);
+			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.xml", true);
 
 			// want this one time, first go around
 			if (!existSubmission) 
@@ -527,16 +508,10 @@ public class CreateGrid extends HttpServlet {
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 				fw.write("<jeopardy>\n");
 			}
-			System.out.println("gameID:  " + gameID);
-			System.out.println("user:  " + user);
-			System.out.println("questions.size():  " + questions.size());
 
 			fw.write("  <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
 			for (int i = 0; i < questions.size(); i++) 
 			{
-				System.out.println("got into for loop " + i + " times");
-				System.out.println("row, col, score " + row[i] + ", " + column[i] + ", " + score[i]);
-				//System.out.println("questions.get(i)  " + questions.get(i));
 				fw.write("   <question>\n");
 				fw.write("    <q>" + questions.get(i) + "</q>\n");
 				fw.write("    <answer>" + answers.get(i) + "</answer>\n");
@@ -548,30 +523,22 @@ public class CreateGrid extends HttpServlet {
 			fw.write("  </game>\n");
 			fw.write("</jeopardy>\n");
 			fw.close();
-			System.out.println("existSubmission:  " + existSubmission);
+			
 			//if last line is </jeopardy>, then remove last line
 			rmOldJeopardy();
+			
 			//rewrite everything from arraylist_lines to the file
 			if (existSubmission)
 			{
-				FileWriter fw2 = new FileWriter("/Users/Samantha/submission2.txt", false);
+				FileWriter fw2 = new FileWriter("/Users/brianahart/Documents/submission.xml", false);
 				for (String line : arraylist_lines)
 				{
-					System.out.println("wrote " + line + " to fw2");
 					//puts every line in arraylist_lines in the file
 					fw2.write(line + "\n");
 				}	
 				fw2.write("</jeopardy>\n");
 
-				//fw2.write("\n");	
 				fw2.close();
-			}
-
-			//fw.close();
-			try {
-				parseXML();
-			} catch (TransformerException e) {
-				e.printStackTrace();
 			}
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
@@ -584,19 +551,14 @@ public class CreateGrid extends HttpServlet {
 		if (existSubmission)
 		{
 			//read in file
-			System.out.println("file from which to read");
-			String fileName = "/Users/Samantha/submission2.txt";
-			System.out.println("creating arraylist_lines");
+			String fileName = "/Users/brianahart/Documents/submission.xml";
 			
-			System.out.println("bufferedReader");
 			BufferedReader r = new BufferedReader(new FileReader(fileName));
 			String in;
 			//add to arraylist_lines
 			while ((in = r.readLine()) != null)
 			{
-				System.out.println("you are in while loop");
 				arraylist_lines.add(in);
-				System.out.println("adding to arraylist_lines:  " + in);
 			}
 			r.close();
 			
@@ -607,22 +569,12 @@ public class CreateGrid extends HttpServlet {
 					arraylist_lines.remove(k);
 				}
 			}
-			//get second from bottom and check to see if matches
-			/*String secondFromBottom = arraylist_lines.get(arraylist_lines.size() - 1);
-			System.out.println("secondFromBottom:  " + secondFromBottom);
-			if (secondFromBottom.matches("</jeopardy>"))
-			{
-				//remove matching secondfrombottom
-				arraylist_lines.remove(arraylist_lines.size() -1);
-				System.out.println("removed arraylist_lines.size() - 1");
-			}*/
 		}
 	}
 	
 	public void parseXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-		// reads and prints	xml
-		//stuff to read file
-		File xml = new File("/Users/Samantha/submission2.txt");
+		
+		File xml = new File("/Users/brianahart/Documents/submission.xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		org.w3c.dom.Document doc = builder.parse(xml);
@@ -631,7 +583,6 @@ public class CreateGrid extends HttpServlet {
 		String root = doc.getDocumentElement().getNodeName();
 		NodeList nodeList_games = doc.getElementsByTagName("game");
 		NodeList nodeList_questions;
-		//In list of games
 		for (int i = 0; i < nodeList_games.getLength(); i++)
 		{
 			NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
@@ -645,75 +596,38 @@ public class CreateGrid extends HttpServlet {
 			idString = idString.replace("d", "");
 			idString = idString.replace("=", "");
 			
-			System.out.println("newID:  " + idString);
-
 			if (Integer.parseInt(idString) >= maxGameID)
 			{
 				maxGameID = Integer.parseInt(idString) + 1;
+				gameID = maxGameID;
 			}
-			
+						
 			for (int q = 0; q < userGameId.getLength(); q++)
 			{
 				Node myNode = userGameId.item(q);
-				//prints id, then user
-				//System.out.println("this should be user or game id: " + myNode.toString());
 			}
+			
 			//gets list of questions
 			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
 			for (int j = 0; j < nodeList_questions.getLength(); j++)
 			{
 				//get q, a, row, col, score
-				System.out.println("number of questions " + nodeList_questions.getLength());
 				Node q = nodeList_questions.item(j);
-				System.out.println(q.getNodeName());
 				NodeList nodeList_q = q.getChildNodes();
 				for (int k = 0; k < nodeList_q.getLength(); k++)
 				{
 					//actual question, answer, row, col, score
-					System.out.println(nodeList_q.item(k).getTextContent());
+					//System.out.println(nodeList_q.item(k).getTextContent());
 				}
 
 			}	
 		}	
-		//System.out.println(ele.toString());
-//		NodeList game = ele.getChildNodes();
-//		if (game != null)
-//		{
-//			//System.out.println();
-//			//Element answer = (Element) game.getElementsByTagName("answer"));
-//			
-//			int length = game.getLength();
-//			for (int i = 0; i < length; i++)
-//			{
-//				Node node = game.item(i);
-//				if (game.item(i).getNodeType() == Node.ELEMENT_NODE)
-//				{
-//					Element question = (Element) node;
-//					question.getElementsByTagName("question");
-//					System.out.println(game.item(i).getNodeName());
-//				}
-//			}
-//			
-
-			
-		}
-		// printDocument(doc, System.out);
+		
+	}
 	
-//		System.out.println("Root element:  " + doc.getDocumentElement().getNodeName());
-
-		// use to print whole doc
-		/*DOMSource domsource = new DOMSource(doc);
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t = tf.newTransformer();
-		t.transform(domsource, result);
-		// System.out.println(writer.toString());*/
-	
-
 	public void updateGame() {
 		try {
-			File file = new File("/Users/Samantha/submission.txt");
+			File file = new File("/Users/brianahart/Documents/submission.xml");
 			Scanner sc = new Scanner(file);
 			String nl = "";
 			int count = 0;
@@ -746,7 +660,7 @@ public class CreateGrid extends HttpServlet {
 						+ column[i] + ";" + score[i]);
 			}
 
-			FileWriter fw = new FileWriter("/Users/Samantha/submission.txt");
+			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.xml");
 
 			for (int i = 0; i < count; i++) {
 				if (newFile.get(i) != null) {
