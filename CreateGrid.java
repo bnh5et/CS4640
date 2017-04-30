@@ -55,6 +55,9 @@ public class CreateGrid extends HttpServlet {
 	ArrayList<String> questions = new ArrayList<String>();
 	ArrayList<String> answers = new ArrayList<String>();
 
+	ArrayList<String> arraylist_lines = new ArrayList<String>();
+	boolean existSubmission = false;
+	
 	private static String LogoutServlet = "http://localhost:8080/Jeopardy/logout";
 	private static String LoginServlet = "http://localhost:8080/Jeopardy/login";
 	private static String BrowseServlet = "http://localhost:8080/Jeopardy/browse";
@@ -505,16 +508,22 @@ public class CreateGrid extends HttpServlet {
 		if (maxGameID > 0) {
 			gameID = maxGameID;
 		}
-		boolean existSubmission = false;
+		//boolean existSubmission = false;
 
-		try {
+		try 
+		{
 			// THIS IS WHERE WE WRITE TO FILE
 			if (new File("/Users/Samantha/submission2.txt").isFile())
 				existSubmission = true;
+			
+			//check to see if last line is "</jeopardy>" and remove
+			rmOldJeopardy();
+
 			FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", true);
 
-			// want this one time
-			if (!existSubmission) {
+			// want this one time, first go around
+			if (!existSubmission) 
+			{
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 				fw.write("<jeopardy>\n");
 			}
@@ -526,6 +535,8 @@ public class CreateGrid extends HttpServlet {
 			for (int i = 0; i < questions.size(); i++) 
 			{
 				System.out.println("got into for loop " + i + " times");
+				System.out.println("row, col, score " + row[i] + ", " + column[i] + ", " + score[i]);
+				//System.out.println("questions.get(i)  " + questions.get(i));
 				fw.write("   <question>\n");
 				fw.write("    <q>" + questions.get(i) + "</q>\n");
 				fw.write("    <answer>" + answers.get(i) + "</answer>\n");
@@ -535,80 +546,78 @@ public class CreateGrid extends HttpServlet {
 				fw.write("   </question>\n");
 			}
 			fw.write("  </game>\n");
-			//TODO fix this so it only prints at the end 
 			fw.write("</jeopardy>\n");
-
+			fw.close();
 			System.out.println("existSubmission:  " + existSubmission);
 			//if last line is </jeopardy>, then remove last line
+			rmOldJeopardy();
+			//rewrite everything from arraylist_lines to the file
 			if (existSubmission)
 			{
-				//remove last line
-				/*FileReader readfile = new FileReader("/Users/Samantha/submission2.txt");
-				int counter = 0;
-				ArrayList<String> lines = new ArrayList<String>();
-				Scanner sc2 = new Scanner(readfile);
-				while (sc2.hasNextLine())
-				{
-					counter++;
-					sc2.nextLine();
-				}
-				sc2.close();*/
-				/*RandomAccessFile raf = new RandomAccessFile("/Users/Samantha/submission2.txt", "rw");
-				System.out.println("raf.length():  "+ raf.length());
-				System.out.println("counter:  " + counter);
-				raf.setLength(counter - 2);
-				raf.close();*/
-				
-				//read in file
-				System.out.println("creating file");
-				String fileName = "/Users/Samantha/submission2.txt";
-				System.out.println("creating arraylist_lines");
-				ArrayList<String> arraylist_lines = new ArrayList<String>();
-				System.out.println("bufferedReader");
-				BufferedReader r = new BufferedReader(new FileReader(fileName));
-				String in;
-				//System.out.println(r.readLine());
-				while ((in = r.readLine()) != null)
-				{
-					System.out.println("you are in while loop");
-					arraylist_lines.add(in);
-					System.out.println("adding to arraylist_lines:  " + in);
-				}
-				r.close();
-	
-				String secondFromBottom = arraylist_lines.get(arraylist_lines.size() - 1);
-				System.out.println("secondFromBottom:  " + secondFromBottom);
-				if (secondFromBottom.matches("</jeopardy>"))
-				{
-					arraylist_lines.remove(arraylist_lines.size() -1);
-					System.out.println("removed arraylist_lines.size() - 1");
-				}
-				fw.close();
-				File fil =  new File("/Users/Samantha/submission2.txt");
-				FileWriter fw2 = new FileWriter(fil, false);
+				FileWriter fw2 = new FileWriter("/Users/Samantha/submission2.txt", false);
 				for (String line : arraylist_lines)
 				{
+					System.out.println("wrote " + line + " to fw2");
 					//puts every line in arraylist_lines in the file
 					fw2.write(line + "\n");
-					//fw2.write("\n");
-				}			
+				}	
+				fw2.write("</jeopardy>\n");
 
 				//fw2.write("\n");	
 				fw2.close();
 			}
 
-			fw.close();
-			//try {
-				//parseXML();
-			//} catch (TransformerException e) {
-			//	e.printStackTrace();
-			//}
+			//fw.close();
+			try {
+				parseXML();
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
 	}
-
 	
+	public void rmOldJeopardy() throws IOException
+	{
+		arraylist_lines.clear();
+		if (existSubmission)
+		{
+			//read in file
+			System.out.println("file from which to read");
+			String fileName = "/Users/Samantha/submission2.txt";
+			System.out.println("creating arraylist_lines");
+			
+			System.out.println("bufferedReader");
+			BufferedReader r = new BufferedReader(new FileReader(fileName));
+			String in;
+			//add to arraylist_lines
+			while ((in = r.readLine()) != null)
+			{
+				System.out.println("you are in while loop");
+				arraylist_lines.add(in);
+				System.out.println("adding to arraylist_lines:  " + in);
+			}
+			r.close();
+			
+			for (int k = 0; k < arraylist_lines.size(); k++)
+			{
+				if (arraylist_lines.get(k).equals("</jeopardy>"))
+				{
+					arraylist_lines.remove(k);
+				}
+			}
+			//get second from bottom and check to see if matches
+			/*String secondFromBottom = arraylist_lines.get(arraylist_lines.size() - 1);
+			System.out.println("secondFromBottom:  " + secondFromBottom);
+			if (secondFromBottom.matches("</jeopardy>"))
+			{
+				//remove matching secondfrombottom
+				arraylist_lines.remove(arraylist_lines.size() -1);
+				System.out.println("removed arraylist_lines.size() - 1");
+			}*/
+		}
+	}
 	
 	public void parseXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
 		// reads and prints	xml
@@ -643,9 +652,6 @@ public class CreateGrid extends HttpServlet {
 				maxGameID = Integer.parseInt(idString) + 1;
 			}
 			
-			
-			//id.toString() prints id="1"
-			//user.toString() prints user="s"
 			for (int q = 0; q < userGameId.getLength(); q++)
 			{
 				Node myNode = userGameId.item(q);
