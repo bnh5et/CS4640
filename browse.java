@@ -1,4 +1,3 @@
-package Jeopardy;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.swing.text.html.HTMLDocument.Iterator;
@@ -54,7 +53,6 @@ public class browse extends HttpServlet {
 		try {
 			PrintBody(out);
 		} catch (ParserConfigurationException | SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -63,10 +61,8 @@ public class browse extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(true);
-		
-		btn = request.getParameter("btn");
 
-		//session.setAttribute("updated", false);
+		btn = request.getParameter("btn");
 
 		int gameNum;
 		Map<String, String> gameList = null;
@@ -74,32 +70,35 @@ public class browse extends HttpServlet {
 			gameList = getGames();
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
-			
+
 		}
 		PrintWriter out = response.getWriter();
-		response.setContentType("text/html");  
+		response.setContentType("text/html");
 
 		if (btn.contains("Delete")) {
 			btn = btn.replace("Delete Game ", "");
 			gameNum = Integer.parseInt(btn);
 
 			if (gameList.get(String.valueOf(gameNum)).equals(user)) {
-				System.out.println("They match");
 				deleteGame(gameNum);
-			} 
-			else
-			{
-				
 			}
 
 		} else if (btn.contains("Update")) {
 			btn = btn.replace("Update Game ", "");
 			gameNum = Integer.parseInt(btn);
+
 			if (gameList.get(String.valueOf(gameNum)).equals(user)) {
 				session.setAttribute("GameNum", gameNum);
 				session.setAttribute("updated", true);
 				response.sendRedirect(CreateGridServlet);
 			}
+
+		} else if (btn.contains("Play")) {
+			btn = btn.replace("Play Game ", "");
+			gameNum = Integer.parseInt(btn);
+			
+			session.setAttribute("GameNum", gameNum);
+			response.sendRedirect(StartGameJSP);
 		}
 		doGet(request, response);
 	}
@@ -214,7 +213,7 @@ public class browse extends HttpServlet {
 			out.println("			 		</form>");
 			out.println("			 	</td>");
 			out.println("			 	<td align=\"center\">");
-			out.println("			 		<form>");
+			out.println("			 		<form action=\"" + BrowseServlet + "\" method=\"post\">");
 			out.println("			 			<input class=\"form\" type=\"submit\" value=\"Play Game " + s
 					+ "\" name=\"btn\">");
 			out.println("			 		</form>");
@@ -230,39 +229,34 @@ public class browse extends HttpServlet {
 
 	public Map<String, String> getGames() throws ParserConfigurationException, SAXException, IOException {
 		Map<String, String> games = new HashMap<String, String>();
-		File xml = new File("/Users/Samantha/submission2.txt");
+
+		File xml = new File("/Users/brianahart/Documents/submission.xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		org.w3c.dom.Document doc = builder.parse(xml);
 		doc.getDocumentElement().normalize();
-		
+
 		String root = doc.getDocumentElement().getNodeName();
-		System.out.println("root:  " + root);
 		NodeList nodeList_games = doc.getElementsByTagName("game");
 		NodeList nodeList_questions;
-		//In list of games
-		for (int i = 0; i < nodeList_games.getLength(); i++)
-		{
+		// In list of games
+		for (int i = 0; i < nodeList_games.getLength(); i++) {
 			NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
 			Node id = userGameId.item(0);
 			Node user = userGameId.item(1);
-			
+
 			String user_string = user.toString();
 			user_string = user_string.substring(5);
 			user_string = user_string.replace("\"", "");
-			
-			
+
 			String id_string = id.toString();
 			id_string = id_string.replace("\"", "");
 			id_string = id_string.replace("i", "");
 			id_string = id_string.replace("d", "");
 			id_string = id_string.replace("=", "");
-			
-			System.out.println("user_string:  " + user_string + ", id_string:  " + id_string);
-			
-			if (!games.containsKey(id_string))
-			{
-				games.put(id_string,  user_string);
+
+			if (!games.containsKey(id_string)) {
+				games.put(id_string, user_string);
 			}
 		}
 		return games;
@@ -271,7 +265,7 @@ public class browse extends HttpServlet {
 	public void deleteGame(int gameNum) {
 
 		try {
-			File file = new File("/Users/Samantha/submission.txt");
+			File file = new File("/Users/brianahart/Documents/submission.xml");
 			Scanner sc = new Scanner(file);
 			String nl = "";
 			int count = 0;
@@ -298,7 +292,7 @@ public class browse extends HttpServlet {
 			}
 			scanner.close();
 
-			FileWriter fw = new FileWriter("/Users/Samantha/submission.txt");
+			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.xml");
 
 			for (int i = 0; i < count; i++) {
 				if (newFile[i] != null) {
