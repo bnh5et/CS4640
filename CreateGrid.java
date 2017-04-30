@@ -308,7 +308,11 @@ public class CreateGrid extends HttpServlet {
 		score = request.getParameterValues("score");
 
 		if (updated) {
-			updateGame();
+			try {
+				updateGame();
+			} catch (ParserConfigurationException | SAXException e) {
+				e.printStackTrace();
+			}
 		} else {
 			try {
 				createGame();
@@ -484,7 +488,6 @@ public class CreateGrid extends HttpServlet {
 	}
 
 	public void createGame() throws ParserConfigurationException, SAXException {
-		
 		try 
 		{
 			try {
@@ -509,7 +512,7 @@ public class CreateGrid extends HttpServlet {
 				fw.write("<jeopardy>\n");
 			}
 
-			fw.write("  <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
+			fw.write(" <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
 			for (int i = 0; i < questions.size(); i++) 
 			{
 				fw.write("   <question>\n");
@@ -520,10 +523,10 @@ public class CreateGrid extends HttpServlet {
 				fw.write("    <score>" + score[i] + "</score>\n");
 				fw.write("   </question>\n");
 			}
-			fw.write("  </game>\n");
+			fw.write(" </game>\n");
 			fw.write("</jeopardy>\n");
 			fw.close();
-			
+      
 			//if last line is </jeopardy>, then remove last line
 			rmOldJeopardy();
 			
@@ -595,7 +598,7 @@ public class CreateGrid extends HttpServlet {
 			idString = idString.replace("i", "");
 			idString = idString.replace("d", "");
 			idString = idString.replace("=", "");
-			
+      
 			if (Integer.parseInt(idString) >= maxGameID)
 			{
 				maxGameID = Integer.parseInt(idString) + 1;
@@ -611,7 +614,19 @@ public class CreateGrid extends HttpServlet {
 			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
 			for (int j = 0; j < nodeList_questions.getLength(); j++)
 			{
-				//get q, a, row, col, score
+				Node q = nodeList_questions.item(j);
+				NodeList nodeList_q = q.getChildNodes();
+      }
+	public void updateGame() throws ParserConfigurationException, SAXException 
+	{
+		try {
+			
+		  //find game with matching gameNum as id
+		  ArrayList<String> fileText = new ArrayList<String>();
+		
+		  fileText.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		  fileText.add("<jeopardy>\n");
+      
 				Node q = nodeList_questions.item(j);
 				NodeList nodeList_q = q.getChildNodes();
 				for (int k = 0; k < nodeList_q.getLength(); k++)
@@ -632,47 +647,115 @@ public class CreateGrid extends HttpServlet {
 			String nl = "";
 			int count = 0;
 
-			while (sc.hasNext()) {
-				nl = sc.nextLine();
-				if (nl.contains(";")) {
-					count++;
+		File xml = new File("/Users/Samantha/submission2.txt");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		org.w3c.dom.Document doc = builder.parse(xml);
+		doc.getDocumentElement().normalize();
+		
+		String root = doc.getDocumentElement().getNodeName();
+		NodeList nodeList_games = doc.getElementsByTagName("game");
+		NodeList nodeList_questions;
+		String idString = "";
+		String userString = "";
+		
+		for (int k = 0; k < fileText.size(); k++)
+		{
+			if (fileText.get(k).equals("</jeopardy>"))
+			{
+				fileText.remove(k);
+			}
+		}
+		
+		//In list of games
+		for (int i = 0; i < nodeList_games.getLength(); i++)
+		{
+			NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
+			Node id = userGameId.item(0);
+			Node user = userGameId.item(1);
+			
+			idString = id.toString();
+			idString = idString.replace("\"", "");
+			idString = idString.replace("i", "");
+			idString = idString.replace("d", "");
+			idString = idString.replace("=", "");
+			
+			userString = user.toString();
+			userString = userString.substring(5);
+			userString = userString.replace("\"", "");
+
+			for (int k = 0; k < fileText.size(); k++)
+			{
+				if (fileText.get(k).equals("</jeopardy>"))
+				{
+					fileText.remove(k);
 				}
 			}
-			sc.close();
+			if (Integer.parseInt(idString) != gameID)
+			{
 
-			ArrayList<String> newFile = new ArrayList<String>();
-			Scanner scanner = new Scanner(file);
-			String line = "";
-			int k = 0;
+				fileText.add(" <game id=\"" + idString + "\" user=\"" + userString + "\">\n");
+				fileText.add("  <question>\n");
+			}
+			
+			//gets list of questions
+			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
+			for (int j = 0; j < nodeList_questions.getLength(); j++)
+			{
+		
+				//get q, a, row, col, score
+				Node q = nodeList_questions.item(j);
+				//System.out.println(q.getNodeName());
+				NodeList nodeList_q = q.getChildNodes();
 
-			for (int i = 0; i < count; i++) {
-				nl = scanner.nextLine();
-				String[] parsedLine = nl.split(";");
 
-				if (Integer.parseInt(parsedLine[0]) != gameID) {
-					newFile.add(nl);
+				for (int k = 0; k < nodeList_q.getLength(); k++)
+				{
+					if (Integer.parseInt(idString) != gameID && nodeList_q.item(k).getNodeType() == Node.ELEMENT_NODE)
+					{
+						
+						fileText.add("  <" + nodeList_q.item(k).getNodeName() + ">" );
+						fileText.add(nodeList_q.item(k).getTextContent());
+						fileText.add("</" + nodeList_q.item(k).getNodeName() + ">\n" );
+					}
+					//actual question, answer, row, col, score
+					//System.out.println(nodeList_q.item(k).getTextContent());
 				}
 			}
-			scanner.close();
-
-			for (int i = 0; i < questions.size(); i++) {
-				newFile.add(gameID + ";" + user + ";" + questions.get(i) + ";" + answers.get(i) + ";" + row[i] + ";"
-						+ column[i] + ";" + score[i]);
+			if (Integer.parseInt(idString) != gameID)
+			{
+				fileText.add("   </question>\n");
+				fileText.add("  </game>\n");
 			}
-
-			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.xml");
-
-			for (int i = 0; i < count; i++) {
-				if (newFile.get(i) != null) {
-					fw.write(newFile.get(i));
-					fw.write("\n");
-				}
-			}
-			fw.close();
+		}
+		
+		fileText.add(" <game id=\"" + gameID + "\" user=\"" + user + "\">\n");
+		for (int i = 0; i < questions.size(); i++) 
+		{
+		
+			fileText.add("  <question>\n");
+			fileText.add("   <q>" + questions.get(i)+ "</q>\n");
+			fileText.add("   <answer>" + answers.get(i) + "</answer>\n");
+			fileText.add("   <row>" + row[i] + "</row>\n");
+			fileText.add("   <col>" + column[i] + "</col>\n");
+			fileText.add("   <score>"+ score[i] + "</score>\n");
+			fileText.add("  </question>\n");
+		
+		}
+		fileText.add(" </game>\n");
+		fileText.add("</jeopardy>\n");
+		//write fileText to the file again
+		FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", false);
+		for (int i = 0; i < fileText.size(); i++)
+		{
+			fw.write(fileText.get(i));
+		}
+		fw.close();
 
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
-	}
+		
+	} //end try
 
 }
