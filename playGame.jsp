@@ -69,7 +69,7 @@
 	int maxrows = 4;
 	
 	//Create the scores file 
-	if ((boolean) session.getAttribute("FirstTurn")) {
+	if ((boolean) session.getAttribute("FirstTurn")) {		
 		session.setAttribute("FirstTurn", false);
 		
 		FileWriter fw = new FileWriter("/Users/brianahart/workspace/Jeopardy/scores.xml", false);
@@ -145,7 +145,6 @@
 	question = new String[maxrows][maxcols];
 	answer = new String[maxrows][maxcols];
 
-	System.out.println("-----------");
 	for (int i = 0; i < rows.size(); i++) {
 		int rowNum = rows.get(i) - 1;
 		int colNum = cols.get(i) - 1;
@@ -268,6 +267,9 @@ td.team:hover {
 		document.form1.hiddenInput.value = "true";
 		form1.submit();
 	}
+	function goToQ(){
+		location.href='http://localhost:8080/Jeopardy/questionInfo.jsp';
+	}
 </script>
 </head>
 
@@ -285,18 +287,18 @@ td.team:hover {
 					%>
 					<td <% 
 					if(points[i][j] != 0) {
-						out.print("onclick=\"alert(\'Hi\')\"");
+						out.print("onclick=\"");
+						out.print("goToQ()");
+						//put in what to do when clicked 
+						session.setAttribute("Question", question[i][j]);
+						session.setAttribute("Answer", answer[i][j]);
+						session.setAttribute("Points", points[i][j]);
+						out.print("\"");
 					}
 					%>>
 						<%
 							if (points[i][j] != 0) {
 								out.println(points[i][j]);
-							}
-							if (question[i][j] != null) {
-								session.setAttribute("Question", question[i][j]);
-							}
-							if (answer[i][j] != null) {
-								session.setAttribute("Question", answer[i][j]);
 							}
 						%>
 					</td>
