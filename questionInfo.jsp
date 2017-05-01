@@ -1,9 +1,34 @@
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileReader" %>
+<%@ page import="java.io.FileWriter" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="javax.xml.parsers.DocumentBuilder" %>
+<%@ page import="javax.xml.parsers.DocumentBuilderFactory" %>
+<%@ page import="javax.xml.parsers.ParserConfigurationException" %>
+<%@ page import="org.w3c.dom.Element" %>
+<%@ page import="org.w3c.dom.NamedNodeMap" %>
+<%@ page import="org.w3c.dom.Node" %>
+<%@ page import="org.w3c.dom.NodeList" %>
+<%@ page import="org.xml.sax.SAXException" %>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
+   
+<%!
+	ArrayList<String> lines = new ArrayList<String>();
+	Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
+%> 
 <%
 	int numTeams = (Integer) session.getAttribute("NumTeams");
 	int turn = (Integer) session.getAttribute("Turn");
+	
+	//Read the scores from file
+	scores = getScores();
+	
 %>        
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -97,6 +122,14 @@ table.team, tr.team, td.team {
 		%>
 		location.href = "http://localhost:8080/Jeopardy/playGame.jsp";
 	}
+	function rightAns() {
+		<% 
+		
+		turn++; 
+		session.setAttribute("Turn", turn);
+		%>
+		location.href = "http://localhost:8080/Jeopardy/playGame.jsp";
+	}
 </script>
 </head>
 <body>
@@ -105,9 +138,12 @@ table.team, tr.team, td.team {
 			<h2>QUESTION</h2>
 			<a>Reveal Answer</a>
 			<p>Did you answer correctly?</p>
-			<button>Yes</button>
+			<button onclick="rightAns()">Yes</button>
 			<button onclick="wrongAns()">No</button>
 			<br>
+			<%
+				out.print(session.getAttribute("Question"));
+			%>
 			<br>
 			<table class="team">
 				<tr class="team">
@@ -122,7 +158,7 @@ table.team, tr.team, td.team {
 						<br> 
 						Score: 
 						<%
-							//out.print(teams.get(i));
+							out.print(scores.get(i));
 						%>
 					</td>
 					<%
@@ -134,3 +170,62 @@ table.team, tr.team, td.team {
 	</center>
 </body>
 </html>
+<%!
+	public void rmLastLine() {
+		String fileName = "/Users/brianahart/workspace/Jeopardy/scores.xml";
+
+		try {
+			BufferedReader r = new BufferedReader(new FileReader(fileName));
+			String in;
+			while ((in = r.readLine()) != null) {
+				lines.add(in);
+			}
+			r.close();
+
+			for (int k = 0; k < lines.size(); k++) {
+				if (lines.get(k).equals("</scores>")) {
+					lines.remove(k);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Map<Integer, Integer> getScores() throws ParserConfigurationException, SAXException, IOException {
+		Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
+	
+		File xml = new File("/Users/brianahart/workspace/Jeopardy/scores.xml");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		org.w3c.dom.Document doc = builder.parse(xml);
+		doc.getDocumentElement().normalize();
+	
+		String root = doc.getDocumentElement().getNodeName();
+		NodeList nl_teams = doc.getElementsByTagName("team");
+		
+		// In list of teams
+		for (int i = 0; i < nl_teams.getLength(); i++) {
+			NamedNodeMap teamId = nl_teams.item(i).getAttributes();
+			Node id = teamId.item(0);
+			
+			String id_string = id.toString();
+			id_string = id_string.replace("\"", "");
+			id_string = id_string.replace("i", "");
+			id_string = id_string.replace("d", "");
+			id_string = id_string.replace("=", "");
+			int id_int = Integer.parseInt(id_string);
+			
+			NodeList nl_score = ((Element)nl_teams.item(i)).getElementsByTagName("score");	
+			
+			Node s = nl_score.item(0);
+			NodeList nl_s = s.getChildNodes();
+			
+			int score_int = Integer.parseInt(nl_s.item(0).getTextContent());
+	
+			scores.put(id_int, score_int);
+			
+		}
+		return scores;
+	}
+%>
