@@ -98,10 +98,6 @@ input[type=submit]:hover {
 		<center>
 			<h1>Let's Play Jeopardy!</h1>
 			<h4>Briana Hart and Samantha Pitcher</h4>
-			<%
-				int gameNum = 1;
-				gameNum = (Integer) session.getAttribute("GameNum");
-			%>
 			<form method="post" action="" onsubmit="return validate()">
 				Number of Teams: 
 				<input type="text" name="numTeams" id="num"/> 
@@ -125,6 +121,7 @@ input[type=submit]:hover {
 			numTeams = Integer.parseInt(str_num);
 			session.setAttribute("NumTeams", numTeams);
 			session.setAttribute("Turn", 1);
+			session.setAttribute("FirstTurn", true);
 			
 			response.sendRedirect("http://localhost:8080/Jeopardy/playGame.jsp");
 		}
