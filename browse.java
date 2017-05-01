@@ -66,45 +66,41 @@ public class browse extends HttpServlet {
 
 		btn = request.getParameter("btn");
 
+		// session.setAttribute("updated", false);
+
 		int gameNum;
 		Map<String, String> gameList = null;
 		try {
 			gameList = getGames();
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
-		}
 
-		response.setContentType("text/html");  
+		}
+		// PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
 
 		if (btn.contains("Delete")) {
 			btn = btn.replace("Delete Game ", "");
 			gameNum = Integer.parseInt(btn);
 
 			if (gameList.get(String.valueOf(gameNum)).equals(user)) {
-
 				try {
 					deleteGame(gameNum);
 				} catch (ParserConfigurationException | SAXException e) {
 					e.printStackTrace();
 				}
-			} 
 			}
-
 		} else if (btn.contains("Update")) {
-
 			btn = btn.replace("Update Game ", "");
 			gameNum = Integer.parseInt(btn);
-
 			if (gameList.get(String.valueOf(gameNum)).equals(user)) {
 				session.setAttribute("GameNum", gameNum);
 				session.setAttribute("updated", true);
 				response.sendRedirect(CreateGridServlet);
 			}
-
 		} else if (btn.contains("Play")) {
 			btn = btn.replace("Play Game ", "");
 			gameNum = Integer.parseInt(btn);
-			
 			session.setAttribute("GameNum", gameNum);
 			response.sendRedirect(StartGameJSP);
 		}
@@ -237,8 +233,7 @@ public class browse extends HttpServlet {
 
 	public Map<String, String> getGames() throws ParserConfigurationException, SAXException, IOException {
 		Map<String, String> games = new HashMap<String, String>();
-
-		File xml = new File("/Users/brianahart/Documents/submission.xml");
+		File xml = new File("/Users/brianahart/Documents/submission.txt");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		org.w3c.dom.Document doc = builder.parse(xml);
@@ -272,114 +267,104 @@ public class browse extends HttpServlet {
 
 	public void deleteGame(int gameNum) throws ParserConfigurationException, SAXException {
 		try {
-		//find game with matching gameNum as id
-		//take out corresponding lines in the file
-	
-		ArrayList<String> fileText = new ArrayList<String>();
-		
-		fileText.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		fileText.add(" <jeopardy>\n");
 
+			// find game with matching gameNum as id
+			// take out corresponding lines in the file
 
-		//get gameID and check to see if == gameNum
-		
-		File xml = new File("/Users/Samantha/submission2.txt");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		org.w3c.dom.Document doc = builder.parse(xml);
-		doc.getDocumentElement().normalize();
-		
-		String root = doc.getDocumentElement().getNodeName();
-		NodeList nodeList_games = doc.getElementsByTagName("game");
-		NodeList nodeList_questions;
-		String idString = "";
-		String userString = "";
-		
-		for (int k = 0; k < fileText.size(); k++)
-		{
-			if (fileText.get(k).equals(" </jeopardy>"))
-			{
-				fileText.remove(k);
-			}
-		}
-		
-		//In list of games
-		for (int i = 0; i < nodeList_games.getLength(); i++)
-		{
-			NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
-			Node id = userGameId.item(0);
-			Node user = userGameId.item(1);
-			
-			idString = id.toString();
-			idString = idString.replace("\"", "");
-			idString = idString.replace("i", "");
-			idString = idString.replace("d", "");
-			idString = idString.replace("=", "");
-			
-			userString = user.toString();
-			userString = userString.substring(5);
-			userString = userString.replace("\"", "");
+			ArrayList<String> fileText = new ArrayList<String>();
 
-			for (int k = 0; k < fileText.size(); k++)
-			{
-				if (fileText.get(k).equals(" </jeopardy>"))
-				{
+			fileText.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			fileText.add("<jeopardy>\n");
+
+			// get gameID and check to see if == gameNum
+
+			File xml = new File("/Users/brianahart/Documents/submission.txt");
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			org.w3c.dom.Document doc = builder.parse(xml);
+			doc.getDocumentElement().normalize();
+
+			String root = doc.getDocumentElement().getNodeName();
+			NodeList nodeList_games = doc.getElementsByTagName("game");
+			NodeList nodeList_questions;
+			String idString = "";
+			String userString = "";
+
+			for (int k = 0; k < fileText.size(); k++) {
+				if (fileText.get(k).equals("</jeopardy>")) {
 					fileText.remove(k);
 				}
 			}
-			if (Integer.parseInt(idString) != gameNum)
-			{
-				fileText.add(" <game id=\"" + idString + "\" user=\"" + userString + "\">\n");
-				fileText.add("  <question>\n");
-			}
-			
-			//gets list of questions
-			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
-			for (int j = 0; j < nodeList_questions.getLength(); j++)
-			{
 
+			// In list of games
+			for (int i = 0; i < nodeList_games.getLength(); i++) {
+				NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
+				Node id = userGameId.item(0);
+				Node user = userGameId.item(1);
 
-				//get q, a, row, col, score
-				Node q = nodeList_questions.item(j);
-				//System.out.println(q.getNodeName());
-				NodeList nodeList_q = q.getChildNodes();
+				idString = id.toString();
+				idString = idString.replace("\"", "");
+				idString = idString.replace("i", "");
+				idString = idString.replace("d", "");
+				idString = idString.replace("=", "");
 
-				for (int k = 0; k < nodeList_q.getLength(); k++)
-				{
-					if (Integer.parseInt(idString) != gameNum && nodeList_q.item(k).getNodeType() == Node.ELEMENT_NODE)
-					{
-						
-						fileText.add("  <" + nodeList_q.item(k).getNodeName() + ">" );
-						fileText.add(nodeList_q.item(k).getTextContent());
-						fileText.add("</" + nodeList_q.item(k).getNodeName() + ">\n" );
+				userString = user.toString();
+				userString = userString.substring(5);
+				userString = userString.replace("\"", "");
+
+				for (int k = 0; k < fileText.size(); k++) {
+					if (fileText.get(k).equals("</jeopardy>")) {
+						fileText.remove(k);
 					}
-					//actual question, answer, row, col, score
-					//System.out.println(nodeList_q.item(k).getTextContent());
+				}
+				if (Integer.parseInt(idString) != gameNum) {
+
+					fileText.add(" <game id=\"" + idString + "\" user=\"" + userString + "\">\n");
+					fileText.add(" <question>\n");
+				}
+
+				// gets list of questions
+				nodeList_questions = ((Element) nodeList_games.item(i)).getElementsByTagName("question");
+				for (int j = 0; j < nodeList_questions.getLength(); j++) {
+
+					// get q, a, row, col, score
+					Node q = nodeList_questions.item(j);
+					// System.out.println(q.getNodeName());
+					NodeList nodeList_q = q.getChildNodes();
+
+					for (int k = 0; k < nodeList_q.getLength(); k++) {
+						if (Integer.parseInt(idString) != gameNum
+								&& nodeList_q.item(k).getNodeType() == Node.ELEMENT_NODE) {
+
+							fileText.add("  <" + nodeList_q.item(k).getNodeName() + ">");
+							fileText.add(nodeList_q.item(k).getTextContent());
+							fileText.add("</" + nodeList_q.item(k).getNodeName() + ">\n");
+						}
+						// actual question, answer, row, col, score
+						// System.out.println(nodeList_q.item(k).getTextContent());
+					}
+
+				}
+
+				if (Integer.parseInt(idString) != gameNum) {
+					fileText.add("   </question>\n");
+					fileText.add("  </game>\n");
 				}
 
 			}
-			
-			if (Integer.parseInt(idString) != gameNum)
-			{
-				fileText.add("  </question>\n");
-				fileText.add(" </game>\n");
-			}
+			fileText.add("</jeopardy>\n");
 
-		}
-		fileText.add(" </jeopardy>\n");
-		
-		//write fileText to the file again
-		FileWriter fw = new FileWriter("/Users/Samantha/submission2.txt", false);
-		for (int i = 0; i < fileText.size(); i++)
-		{
-			fw.write(fileText.get(i));
-		}
-		fw.close();
+			// write fileText to the file again
+			FileWriter fw = new FileWriter("/Users/brianahart/Documents/submission.txt", false);
+			for (int i = 0; i < fileText.size(); i++) {
+				fw.write(fileText.get(i));
+			}
+			fw.close();
 
 		} catch (IOException e) {
 			System.out.println("Could not write to file");
 		}
-		
-	} //end try
-	
+
+	} // end try
+
 }
