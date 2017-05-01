@@ -1,12 +1,59 @@
-<%@ page import="java.util.Map"%>
-<%@ page import="java.util.HashMap"%>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileReader" %>
+<%@ page import="java.io.FileWriter" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="javax.xml.parsers.DocumentBuilder" %>
+<%@ page import="javax.xml.parsers.DocumentBuilderFactory" %>
+<%@ page import="javax.xml.parsers.ParserConfigurationException" %>
+<%@ page import="org.w3c.dom.Element" %>
+<%@ page import="org.w3c.dom.NamedNodeMap" %>
+<%@ page import="org.w3c.dom.Node" %>
+<%@ page import="org.w3c.dom.NodeList" %>
+<%@ page import="org.xml.sax.SAXException" %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%! 
+	ArrayList<Integer> rows = new ArrayList<Integer>();
+	ArrayList<Integer> cols = new ArrayList<Integer>();
+	ArrayList<Integer> points_list = new ArrayList<Integer>();
+	ArrayList<String> q_list = new ArrayList<String>();
+	ArrayList<String> a_list = new ArrayList<String>();
 
-<%
+	int maxrows;
+	int maxcols;
+	int[][] points;
+	String[][] question;
+	String[][] answer;
+	Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
+%>
+<%	
+	//Clear everything 
+	if ((boolean) session.getAttribute("FirstTurn")) {
+		rows.clear();
+		cols.clear();
+		points_list.clear();
+		q_list.clear();
+		a_list.clear();
+		maxrows = 0;
+		maxcols = 0;
+		points = new int[0][0];
+		question = new String[0][0];
+		scores = new HashMap<Integer, Integer>();
+	}
+
+	//Get the game number
+	int gameNum = (Integer) session.getAttribute("GameNum");
+	
+	//Get the number of teams
 	int numTeams = (Integer) session.getAttribute("NumTeams");
 	
+	//Get the turn 
 	int turn = (Integer) session.getAttribute("Turn");
 	if(request.getParameter("hiddenInput") != null) {
 		turn++;
@@ -15,6 +62,98 @@
 		turn = 1;
 	}
 	session.setAttribute("Turn", turn);
+	
+	
+	//Find the max rows and cols 
+	int maxcols = 4;
+	int maxrows = 4;
+	
+	//Create the scores file 
+	if ((boolean) session.getAttribute("FirstTurn")) {
+		session.setAttribute("FirstTurn", false);
+		
+		FileWriter fw = new FileWriter("/Users/brianahart/workspace/Jeopardy/scores.xml", false);
+		fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		fw.write("<scores>\n");
+		
+		for (int i = 0; i < numTeams; i++) 
+		{
+			fw.write("	<team id=\"" + (i+1) + "\">\n");
+			fw.write("		<score>0</score>\n");
+			fw.write("	</team>\n");
+		}
+		fw.write("</scores>\n");
+		fw.close();
+	}
+	
+	//Read the scores from file
+	scores = getScores();
+	
+	//Get the questions from the file 
+	File xml = new File("/Users/brianahart/Documents/submission.txt");
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	DocumentBuilder builder = factory.newDocumentBuilder();
+	org.w3c.dom.Document doc = builder.parse(xml);
+	doc.getDocumentElement().normalize();
+
+	String root = doc.getDocumentElement().getNodeName();
+	NodeList nodeList_games = doc.getElementsByTagName("game");
+	NodeList nodeList_questions;
+	
+	// In list of games
+	for (int i = 0; i < nodeList_games.getLength(); i++) {
+		NamedNodeMap userGameId = nodeList_games.item(i).getAttributes();
+		Node id = userGameId.item(0);
+		String id_string = id.toString();
+		id_string = id_string.replace("\"", "");
+		id_string = id_string.replace("i", "");
+		id_string = id_string.replace("d", "");
+		id_string = id_string.replace("=", "");
+		int id_int = Integer.parseInt(id_string);
+		
+		if(id_int == gameNum){
+			nodeList_questions = ((Element)nodeList_games.item(i)).getElementsByTagName("question");
+			for (int j = 0; j < nodeList_questions.getLength(); j++) {
+				Node q = nodeList_questions.item(j);
+				NodeList nodeList_q = q.getChildNodes();
+				
+				q_list.add(nodeList_q.item(1).getTextContent());
+				a_list.add(nodeList_q.item(3).getTextContent());
+				rows.add(Integer.parseInt(nodeList_q.item(5).getTextContent()));
+				cols.add(Integer.parseInt(nodeList_q.item(7).getTextContent()));
+				points_list.add(Integer.parseInt(nodeList_q.item(9).getTextContent()));
+			}
+		}	
+	}
+	maxrows = 0;
+	maxcols = 0;
+	for (int i = 0; i < rows.size(); i++) {
+		int rowInt = rows.get(i);
+		if (rowInt > maxrows) {
+			maxrows = rowInt;
+		}
+	}
+
+	for (int i = 0; i < cols.size(); i++) {
+		int colInt = cols.get(i);
+		if (colInt > maxcols) {
+			maxcols = colInt;
+		}
+	}
+	
+	points = new int[maxrows][maxcols];
+	question = new String[maxrows][maxcols];
+	answer = new String[maxrows][maxcols];
+
+	System.out.println("-----------");
+	for (int i = 0; i < rows.size(); i++) {
+		int rowNum = rows.get(i) - 1;
+		int colNum = cols.get(i) - 1;
+		points[rowNum][colNum] = points_list.get(i);
+		question[rowNum][colNum] = q_list.get(i);
+		answer[rowNum][colNum] = a_list.get(i);
+	}
+	
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -135,22 +274,30 @@ td.team:hover {
 <body>
 	<center>
 		<div>
-			<h3>Team <%out.print(turn); %>'s Turn</h3>
+			<h1>Team <%out.print(turn);%>'s Turn</h1>
 			<table>
 				<%
-					for (int i = 0; i < 4; i++) { //maxrows
+					for (int i = 0; i < maxrows; i++) { //maxrows
 				%>
 				<tr>
 					<%
-						for (int j = 0; j < 4; j++) { //maxcols
+						for (int j = 0; j < maxcols; j++) { //maxcols
 					%>
-					<td onclick="alert('Clicked ')">
+					<td <% 
+					if(points[i][j] != 0) {
+						out.print("onclick=\"alert(\'Hi\')\"");
+					}
+					%>>
 						<%
-							out.println("Hi");
-									/*if (scores[i][j] != 0) {
-										out.println(scores[i][j]);
-									}*/
-							
+							if (points[i][j] != 0) {
+								out.println(points[i][j]);
+							}
+							if (question[i][j] != null) {
+								session.setAttribute("Question", question[i][j]);
+							}
+							if (answer[i][j] != null) {
+								session.setAttribute("Question", answer[i][j]);
+							}
 						%>
 					</td>
 					<%
@@ -161,13 +308,6 @@ td.team:hover {
 					}
 				%>
 			</table>
-			<%
-			Map<Integer, Integer> teams = new HashMap<Integer, Integer>();
-			for(int i = 1; i <= numTeams; i++){
-				teams.put(i, 0);
-			}
-
-			%>
 			<br>
 			<table class="team">
 				<tr class="team">
@@ -181,7 +321,7 @@ td.team:hover {
 						<br> 
 						Score: 
 						<%
-							out.print(teams.get(i));
+							out.print(scores.get(i));
 						%>
 					</td>
 					<%
@@ -203,3 +343,41 @@ td.team:hover {
 	</center>
 </body>
 </html>
+<%!
+	public Map<Integer, Integer> getScores() throws ParserConfigurationException, SAXException, IOException {
+		Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
+	
+		File xml = new File("/Users/brianahart/workspace/Jeopardy/scores.xml");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		org.w3c.dom.Document doc = builder.parse(xml);
+		doc.getDocumentElement().normalize();
+	
+		String root = doc.getDocumentElement().getNodeName();
+		NodeList nl_teams = doc.getElementsByTagName("team");
+		
+		// In list of teams
+		for (int i = 0; i < nl_teams.getLength(); i++) {
+			NamedNodeMap teamId = nl_teams.item(i).getAttributes();
+			Node id = teamId.item(0);
+			
+			String id_string = id.toString();
+			id_string = id_string.replace("\"", "");
+			id_string = id_string.replace("i", "");
+			id_string = id_string.replace("d", "");
+			id_string = id_string.replace("=", "");
+			int id_int = Integer.parseInt(id_string);
+			
+			NodeList nl_score = ((Element)nl_teams.item(i)).getElementsByTagName("score");	
+			
+			Node s = nl_score.item(0);
+			NodeList nl_s = s.getChildNodes();
+			
+			int score_int = Integer.parseInt(nl_s.item(0).getTextContent());
+	
+			scores.put(id_int, score_int);
+			
+		}
+		return scores;
+	}
+%>
