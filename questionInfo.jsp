@@ -21,13 +21,39 @@
 <%!
 	ArrayList<String> lines = new ArrayList<String>();
 	Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
+	int numTeams;
+	int turn;
+	String question, answer;
 %> 
 <%
-	int numTeams = (Integer) session.getAttribute("NumTeams");
-	int turn = (Integer) session.getAttribute("Turn");
+	//Set up game
+	numTeams = (Integer) session.getAttribute("NumTeams");
+	turn = (Integer) session.getAttribute("Turn");
+	question = (String)session.getAttribute("Question");
+	answer = (String)session.getAttribute("Answer");
 	
 	//Read the scores from file
 	scores = getScores();
+	
+	//If user clicks no
+	if(request.getParameter("hiddenInput1") != null) {
+		turn++; 
+		session.setAttribute("Turn", turn);
+		response.sendRedirect("http://localhost:8080/Jeopardy/playGame.jsp");
+	}
+	
+	//Increase the score and write to file 
+	if(request.getParameter("hiddenInput2") != null) {
+		int teamScore = scores.get(turn);
+		int newScore = teamScore + 20; //+ passed score 
+		scores.put(turn, newScore);
+		
+		turn++; 
+		session.setAttribute("Turn", turn);
+		response.sendRedirect("http://localhost:8080/Jeopardy/playGame.jsp");
+		
+		writeScores();
+	}
 	
 %>        
 
@@ -85,6 +111,22 @@ input[type=submit]:hover {
 	cursor: pointer;
 }
 
+input[type=button] {
+	width: 50px;
+	display: inline-block;
+	background-color: maroon;
+	border: 1px solid maroon;
+	color: white;
+	text-decoration: none;
+	font-size: 12px;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+input[type=button]:hover {
+	cursor: pointer;
+}
+
 table, th, td {
 	border: 1px solid black;
 	color: white;
@@ -116,34 +158,31 @@ table.team, tr.team, td.team {
 
 <script type="text/javascript">
 	function wrongAns() {
-		<% 
-		turn++; 
-		session.setAttribute("Turn", turn);
-		%>
-		location.href = "http://localhost:8080/Jeopardy/playGame.jsp";
+		document.form1.hiddenInput1.value = "true";
+		form1.submit();
 	}
 	function rightAns() {
-		<% 
-		
-		turn++; 
-		session.setAttribute("Turn", turn);
-		%>
-		location.href = "http://localhost:8080/Jeopardy/playGame.jsp";
+		document.form2.hiddenInput2.value = "true";
+		form2.submit();
 	}
 </script>
 </head>
 <body>
 	<center>
 		<div>
-			<h2>QUESTION</h2>
-			<a>Reveal Answer</a>
+			<h2><%out.print(question); %></h2>
+			<a><%out.print(answer); %></a>
 			<p>Did you answer correctly?</p>
-			<button onclick="rightAns()">Yes</button>
-			<button onclick="wrongAns()">No</button>
+			
+			<form method="post" name="form1">
+				<input type="hidden" name="hiddenInput1">
+				<input type="button" value="No" onclick="wrongAns()">
+			</form>
+			<form method="post"	name="form2">
+				<input type="hidden" name="hiddenInput2">
+				<input type="button" value="Yes" onclick="rightAns()">
+			</form>
 			<br>
-			<%
-				out.print(session.getAttribute("Question"));
-			%>
 			<br>
 			<table class="team">
 				<tr class="team">
@@ -171,26 +210,6 @@ table.team, tr.team, td.team {
 </body>
 </html>
 <%!
-	public void rmLastLine() {
-		String fileName = "/Users/brianahart/workspace/Jeopardy/scores.xml";
-
-		try {
-			BufferedReader r = new BufferedReader(new FileReader(fileName));
-			String in;
-			while ((in = r.readLine()) != null) {
-				lines.add(in);
-			}
-			r.close();
-
-			for (int k = 0; k < lines.size(); k++) {
-				if (lines.get(k).equals("</scores>")) {
-					lines.remove(k);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public Map<Integer, Integer> getScores() throws ParserConfigurationException, SAXException, IOException {
 		Map<Integer, Integer> scores = new HashMap<Integer, Integer>();
@@ -227,5 +246,24 @@ table.team, tr.team, td.team {
 			
 		}
 		return scores;
+	}
+	
+	public void writeScores() {		
+		try {
+			FileWriter fw = new FileWriter("/Users/brianahart/workspace/Jeopardy/scores.xml", false);
+			fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			fw.write("<scores>\n");
+			
+			for (int i = 0; i < numTeams; i++) 
+			{
+				fw.write("	<team id=\"" + (i + 1) + "\">\n");
+				fw.write("		<score>" + scores.get(i + 1) + "</score>\n");
+				fw.write("	</team>\n");
+			}
+			fw.write("</scores>\n");
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 %>
